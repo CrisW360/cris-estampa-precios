@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cris Estampa - Gestor de Precios</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        // Personalizando colores según el brandboard de Cris Estampa
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        crisDark: '#132A20',      // Verde oscuro profundo del logo
+                        crisCard: '#1C3B2E',      // Verde sutil para tarjetas
+                        crisAccent: '#E8DCC4',    // Crema marfil característico
+                        crisGold: '#D4A373'       // Tono cálido de acento
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Script oficial de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Tus credenciales de Supabase
+        const SUPABASE_URL = 'https://wgxvnbhkiaiewasueneo.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_s0RkJLZu1gmIyJ2Xcon5Xg_ErgG5vZP';
+        
+        // Inicializamos el cliente de Supabase
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function appData() {
+            return {
+                productos: [],
+                mensaje: '',
+                
+                // Función que se ejecuta al abrir la app (Carga desde Supabase)
+                async init() {
+                    try {
+                        let { data, error } = await supabaseClient
+                            .from('productos')
+                            .select('*');
+                        
+                        if (error) throw error;
+                        
+                        // Mapeamos los datos asegurando que coincidan con las columnas de la BBDD
+                        this.productos = data.map(p => ({
+                            id: p.id,
+                            nombre: p.nombre,
+                            costoPrenda: p.costo_prenda,
+                            costoDtf: p.costo_dtf,
+                            costoPackaging: p.costo_packaging,
+                            multiplicador: p.multiplicador
+                        }));
+                    } catch (e) {
+                        console.error('Error al cargar productos:', e.message);
+                        this.mensaje = 'Error al conectar con la base de datos.';
+                    }
+                },
+
+                calcularTotal(p) {
+                    return (p.costoPrenda || 0) + (p.costoDtf || 0) + (p.costoPackaging || 0);
+                },
+                
+                calcularPrecio(p) {
+                    return this.calcularTotal(p) * (p.multiplicador || 2.0);
+                },
+                
+                formatMoney(val) {
+                    return '$ ' + Math.round(val).toLocaleString('es-AR');
+                },
+
+                // Función para guardar cambios en tiempo real en la nube
+                async guardarCambios() {
+                    try {
+                        for (let p of this.productos) {
+                            let { error } = await supabaseClient
+                                .from('productos')
+                                .update({
+                                    costo_prenda: p.costoPrenda,
+                                    costo_dtf: p.costoDtf,
+                                    costo_packaging: p.costoPackaging,
+                                    multiplicador: p.multiplicador
+                                })
+                                .eq('id', p.id);
+
+                            if (error) throw error;
+                        }
+
+                        this.mensaje = '¡Precios actualizados y sincronizados en la nube!';
+                        setTimeout(() => this.mensaje = '', 3500);
+                    } catch (e) {
+                        console.error('Error al guardar en Supabase:', e.message);
+                        this.mensaje = 'Hubo un error al guardar los cambios.';
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-crisDark text-crisAccent min-h-screen font-sans antialiased selection:bg-crisGold selection:text-crisDark">
+
+    <div class="max-w-4xl mx-auto px-4 py-8" x-data="appData()">
+        <!-- Header con identidad de marca -->
+        <header class="flex flex-col sm:flex-row justify-between items-center mb-8 border-b border-emerald-900/50 pb-6 gap-4">
+            <div class="flex items-center gap-3">
+                <!-- Simulación del isotipo minimalista -->
+                <div class="w-12 h-12 rounded-2xl bg-crisAccent text-crisDark flex items-center justify-center font-black text-xl shadow-lg">
+                    C
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black tracking-wider text-white">CRIS <span class="text-crisGold font-medium text-lg">estampa</span></h1>
+                    <p class="text-xs text-emerald-300/70">Calculadora de Costos y Precios Automatizada</p>
+                </div>
+            </div>
+            <button @click="guardarCambios()" class="bg-crisGold hover:bg-[#c29263] text-crisDark px-5 py-2.5 rounded-xl text-sm font-bold transition shadow-lg shadow-black/35 flex items-center gap-2">
+                <span>Guardar Cambios</span>
+            </button>
+        </header>
+
+        <!-- Mensaje de éxito flotante -->
+        <div x-show="mensaje" x-transition class="mb-6 p-4 bg-emerald-900/90 border border-emerald-500/40 text-emerald-200 text-sm rounded-2xl text-center shadow-xl" x-text="mensaje"></div>
+
+        <!-- Listado de Productos -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <template x-for="(prod, index) in productos" :key="prod.id">
+                <div class="bg-crisCard border border-emerald-900/40 rounded-3xl p-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
+                    
+                    <h2 class="text-lg font-bold text-white mb-4 border-b border-emerald-900/40 pb-2" x-text="prod.nombre"></h2>
+                    
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="text-emerald-200/70">Costo Prenda ($):</span>
+                            <input type="number" x-model.number="prod.costoPrenda" class="bg-crisDark border border-emerald-800/60 rounded-xl px-3 py-1.5 w-32 text-right text-white font-medium focus:outline-none focus:border-crisGold transition">
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-emerald-200/70">Costo DTF ($):</span>
+                            <input type="number" x-model.number="prod.costoDtf" class="bg-crisDark border border-emerald-800/60 rounded-xl px-3 py-1.5 w-32 text-right text-white font-medium focus:outline-none focus:border-crisGold transition">
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-emerald-200/70">Packaging ($):</span>
+                            <input type="number" x-model.number="prod.costoPackaging" class="bg-crisDark border border-emerald-800/60 rounded-xl px-3 py-1.5 w-32 text-right text-white/50 font-medium cursor-not-allowed" disabled>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-emerald-200/70">Multiplicador (Margen):</span>
+                            <input type="number" step="0.1" x-model.number="prod.multiplicador" class="bg-crisDark border border-emerald-800/60 rounded-xl px-3 py-1.5 w-32 text-right text-white font-medium focus:outline-none focus:border-crisGold transition">
+                        </div>
+                    </div>
+
+                    <!-- Resultados en vivo -->
+                    <div class="mt-6 pt-4 border-t border-emerald-900/40 flex justify-between items-center">
+                        <div>
+                            <p class="text-[11px] uppercase tracking-wider text-emerald-300/60 font-semibold">Costo Total</p>
+                            <p class="text-base font-semibold text-emerald-100" x-text="formatMoney(calcularTotal(prod))"></p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[11px] uppercase tracking-wider text-crisGold font-bold">Precio Sugerido (2x)</p>
+                            <p class="text-2xl font-black text-crisGold" x-text="formatMoney(calcularPrecio(prod))"></p>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+</body>
+</html>
