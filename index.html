@@ -34,7 +34,7 @@
           cargandoLogin: false,
           emailLogin: "",
           passwordLogin: "",
-          recordarme: true, // Por defecto marcado para mayor comodidad en PC
+          recordarme: true,
           
           seccionActiva: 'calculadora',
           productos: [],
@@ -79,7 +79,7 @@
           nuevoGasto: {
             concepto: "",
             monto: 0,
-            categoria: "Insumos DTF"
+            categoria: "DTF Tercerizado"
           },
 
           nuevoItemStock: {
@@ -91,7 +91,6 @@
           },
 
           async init() {
-            // Verificar si ya hay una sesión activa guardada
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
               this.sesionIniciada = true;
@@ -111,15 +110,11 @@
           async iniciarSesion() {
             this.cargandoLogin = true;
             try {
-              // Si "recordarme" está activo, aseguramos persistencia local
-              if (this.recordarme) {
-                await supabaseClient.auth.setSession();
-              }
-
               const { data, error } = await supabaseClient.auth.signInWithPassword({
                 email: this.emailLogin,
                 password: this.passwordLogin,
               });
+              
               if (error) throw error;
               
               this.sesionIniciada = true;
@@ -394,7 +389,7 @@
               let { error } = await supabaseClient.from("gastos").insert([payload]);
               if (error) throw error;
 
-              this.nuevoGasto = { concepto: "", monto: 0, categoria: "Insumos DTF" };
+              this.nuevoGasto = { concepto: "", monto: 0, categoria: "DTF Tercerizado" };
               this.abrirModalGasto = false;
               await this.cargarGastos();
               this.mensaje = "¡Gasto registrado con éxito!";
@@ -498,7 +493,7 @@
   </head>
   <body class="bg-crisDark text-crisAccent min-h-screen font-sans antialiased selection:bg-crisGold selection:text-crisDark" x-data="masterApp()">
 
-    <!-- ================= PANTALLA DE LOGIN (SI NO HAY SESIÓN) ================= -->
+    <!-- ================= PANTALLA DE LOGIN ================= -->
     <div x-show="!sesionIniciada" class="min-h-screen flex items-center justify-center p-4">
       <div class="bg-crisCard border border-emerald-900/60 rounded-3xl p-8 w-full max-w-md shadow-2xl text-center">
         <div class="flex justify-center mb-4">
@@ -519,7 +514,6 @@
             <input type="password" x-model="passwordLogin" required placeholder="••••••••" class="w-full bg-crisDark border border-emerald-800 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-crisGold text-sm" />
           </div>
 
-          <!-- Casillero Recordarme -->
           <div class="flex items-center gap-2 pt-1">
             <input type="checkbox" id="recordarme" x-model="recordarme" class="w-4 h-4 rounded bg-crisDark border-emerald-800 text-crisGold focus:ring-0 accent-crisGold cursor-pointer" />
             <label for="recordarme" class="text-emerald-200/80 cursor-pointer select-none">Recordarme en este dispositivo</label>
@@ -533,7 +527,7 @@
       </div>
     </div>
 
-    <!-- ================= APLICACIÓN PRINCIPAL (SI HAY SESIÓN) ================= -->
+    <!-- ================= APLICACIÓN PRINCIPAL ================= -->
     <div x-show="sesionIniciada" class="max-w-4xl mx-auto px-4 py-6" style="display: none;">
       
       <!-- HEADER -->
@@ -636,7 +630,7 @@
         </template>
       </div>
 
-      <!-- ================= SECCIÓN 2: SEGUIMIENTO DE PEDIDOS ================= -->
+      <!-- ================= SECCIÓN 2: PEDIDOS ================= -->
       <div x-show="seccionActiva === 'pedidos'" style="display: none;">
         <div class="flex justify-between items-center mb-6">
           <div>
@@ -653,7 +647,6 @@
             <div class="bg-crisCard border border-emerald-900/40 rounded-3xl p-5 shadow-2xl flex flex-col justify-between relative overflow-hidden">
               
               <div>
-                <!-- Cabecera de Tarjeta -->
                 <div class="flex justify-between items-center mb-3">
                   <span class="text-[10px] uppercase font-black tracking-wider bg-crisDark text-crisGold px-2.5 py-1 rounded-xl border border-emerald-800/60" x-text="p.etiqueta || 'General'"></span>
                   
@@ -667,7 +660,6 @@
                     }" x-text="p.estado"></span>
                 </div>
 
-                <!-- Botón Google Drive -->
                 <div class="mb-4">
                   <template x-if="p.link_carpeta">
                     <a :href="p.link_carpeta" target="_blank" class="w-full bg-crisDark hover:bg-emerald-950 border border-emerald-800/80 rounded-2xl py-2.5 px-3 flex items-center justify-center gap-2 text-xs font-bold text-crisGold transition shadow-md">
@@ -681,7 +673,6 @@
                   </template>
                 </div>
 
-                <!-- Datos del Cliente y Detalle -->
                 <div class="mb-4">
                   <h3 class="font-bold text-white text-base mb-0.5" x-text="p.clientes ? p.clientes.nombre : 'Cliente Genérico'"></h3>
                   <p class="text-xs text-crisGold mb-2" x-text="p.clientes ? (p.clientes.localidad + (p.clientes.zona ? ' (' + p.clientes.zona + ')' : '')) : ''"></p>
@@ -693,7 +684,6 @@
                 </div>
               </div>
 
-              <!-- Pie de Tarjeta -->
               <div class="pt-3 border-t border-emerald-900/40 flex flex-col gap-2 text-xs">
                 <div class="flex justify-between items-center">
                   <div>
@@ -719,7 +709,7 @@
         </div>
       </div>
 
-      <!-- ================= SECCIÓN 3: AGENDA DE CLIENTES ================= -->
+      <!-- ================= SECCIÓN 3: CLIENTES ================= -->
       <div x-show="seccionActiva === 'clientes'" style="display: none;">
         <div class="flex justify-between items-center mb-6">
           <div>
@@ -744,7 +734,6 @@
                 <p class="text-xs text-emerald-200/60 mb-3" x-text="c.email ? '✉️ ' + c.email : ''"></p>
               </div>
 
-              <!-- Botones Editar / Eliminar Cliente -->
               <div class="pt-3 border-t border-emerald-900/40 flex justify-end gap-2 text-xs">
                 <button @click="prepararEdicionCliente(c)" class="text-emerald-300 hover:text-white bg-emerald-950 px-3 py-1 rounded-lg border border-emerald-800">Editar</button>
                 <button @click="eliminarCliente(c.id)" class="text-red-300 hover:text-red-100 bg-red-950/60 px-3 py-1 rounded-lg border border-red-900">Eliminar</button>
@@ -754,7 +743,7 @@
         </div>
       </div>
 
-      <!-- ================= SECCIÓN 4: FINANZAS Y CAJA ================= -->
+      <!-- ================= SECCIÓN 4: FINANZAS ================= -->
       <div x-show="seccionActiva === 'finanzas'" style="display: none;">
         <div class="flex justify-between items-center mb-6">
           <div>
@@ -766,7 +755,6 @@
           </button>
         </div>
 
-        <!-- Tarjetas de Resumen (KPIs Financieros) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div class="bg-crisCard border border-emerald-900/50 rounded-2xl p-4 shadow-xl">
             <p class="text-[11px] uppercase tracking-wider text-emerald-300/60 font-semibold mb-1">Ventas Totales</p>
@@ -786,7 +774,6 @@
           </div>
         </div>
 
-        <!-- Panel de Ganancia Neta -->
         <div class="bg-gradient-to-r from-emerald-950 to-crisCard border border-emerald-700/40 rounded-3xl p-6 shadow-2xl mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div>
             <h3 class="text-sm uppercase tracking-wider font-bold text-emerald-300/80 mb-1">Balance General Estimado</h3>
@@ -798,7 +785,6 @@
           </div>
         </div>
 
-        <!-- Listado de Gastos Registrados -->
         <div class="bg-crisCard border border-emerald-900/40 rounded-3xl p-5 shadow-2xl">
           <h3 class="text-base font-bold text-white mb-4 border-b border-emerald-900/40 pb-2">Historial de Gastos del Taller</h3>
           
@@ -822,7 +808,7 @@
         </div>
       </div>
 
-      <!-- ================= SECCIÓN 5: STOCK E INVENTARIO ================= -->
+      <!-- ================= SECCIÓN 5: STOCK ================= -->
       <div x-show="seccionActiva === 'stock'" style="display: none;">
         <div class="flex justify-between items-center mb-6">
           <div>
@@ -841,7 +827,6 @@
                 <div class="flex justify-between items-start mb-2">
                   <span class="text-[10px] uppercase font-bold bg-crisDark text-crisGold px-2.5 py-1 rounded-xl border border-emerald-800/60" x-text="i.categoria"></span>
                   
-                  <!-- Alerta visual si está bajo stock -->
                   <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full"
                     :class="Number(i.stock_actual) <= Number(i.stock_minimo) ? 'bg-red-950 text-red-300 border border-red-800' : 'bg-emerald-950 text-emerald-300 border border-emerald-800'"
                     x-text="Number(i.stock_actual) <= Number(i.stock_minimo) ? '⚠️ Reponer' : '✓ OK'"></span>
@@ -849,7 +834,6 @@
 
                 <h3 class="font-bold text-white text-base mb-3" x-text="i.item"></h3>
 
-                <!-- Contador de Stock Actual -->
                 <div class="bg-crisDark/60 border border-emerald-900/50 rounded-2xl p-3 flex justify-between items-center mb-4">
                   <div>
                     <p class="text-[10px] uppercase tracking-wider text-emerald-300/60 font-semibold">Disponible</p>
@@ -857,7 +841,6 @@
                       <span x-text="i.stock_actual"></span> <span class="text-xs font-normal text-emerald-300/70" x-text="i.unidad"></span>
                     </p>
                   </div>
-                  <!-- Botones rápidos + / - -->
                   <div class="flex items-center gap-1.5">
                     <button @click="ajustarStockRapido(i, -1)" class="bg-emerald-950 hover:bg-emerald-900 text-emerald-300 w-8 h-8 rounded-xl border border-emerald-800 font-bold flex items-center justify-center transition">-</button>
                     <button @click="ajustarStockRapido(i, 1)" class="bg-emerald-950 hover:bg-emerald-900 text-emerald-300 w-8 h-8 rounded-xl border border-emerald-800 font-bold flex items-center justify-center transition">+</button>
@@ -865,7 +848,6 @@
                 </div>
               </div>
 
-              <!-- Pie de Tarjeta (Editar / Eliminar) -->
               <div class="pt-3 border-t border-emerald-900/40 flex justify-end gap-2 text-xs">
                 <button @click="prepararEdicionStock(i)" class="text-emerald-300 hover:text-white bg-emerald-950 px-3 py-1 rounded-lg border border-emerald-800">Editar</button>
                 <button @click="eliminarItemStock(i.id)" class="text-red-300 hover:text-red-100 bg-red-950/60 px-3 py-1 rounded-lg border border-red-900">Eliminar</button>
@@ -881,7 +863,7 @@
         </template>
       </div>
 
-      <!-- MODAL CREAR / EDITAR PEDIDO -->
+      <!-- MODAL PEDIDO -->
       <div x-show="abrirModalPedido" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
         <div class="bg-crisCard border border-emerald-900 rounded-3xl p-6 w-full max-w-md shadow-2xl" @click.away="abrirModalPedido = false">
           <div class="flex justify-between items-center mb-4 pb-3 border-b border-emerald-900/50">
@@ -938,7 +920,7 @@
         </div>
       </div>
 
-      <!-- MODAL CREAR / EDITAR CLIENTE -->
+      <!-- MODAL CLIENTE -->
       <div x-show="abrirModalCliente" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
         <div class="bg-crisCard border border-emerald-900 rounded-3xl p-6 w-full max-w-md shadow-2xl" @click.away="abrirModalCliente = false">
           <div class="flex justify-between items-center mb-4 pb-3 border-b border-emerald-900/50">
@@ -974,7 +956,7 @@
         </div>
       </div>
 
-      <!-- MODAL REGISTRAR GASTO -->
+      <!-- MODAL GASTO -->
       <div x-show="abrirModalGasto" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
         <div class="bg-crisCard border border-emerald-900 rounded-3xl p-6 w-full max-w-md shadow-2xl" @click.away="abrirModalGasto = false">
           <div class="flex justify-between items-center mb-4 pb-3 border-b border-emerald-900/50">
@@ -1012,7 +994,7 @@
         </div>
       </div>
 
-      <!-- MODAL CREAR / EDITAR STOCK -->
+      <!-- MODAL STOCK -->
       <div x-show="abrirModalStock" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
         <div class="bg-crisCard border border-emerald-900 rounded-3xl p-6 w-full max-w-md shadow-2xl" @click.away="abrirModalStock = false">
           <div class="flex justify-between items-center mb-4 pb-3 border-b border-emerald-900/50">
@@ -1023,7 +1005,7 @@
           <form @submit.prevent="guardarStockItem()" class="space-y-4 text-xs">
             <div>
               <label class="block text-emerald-300/80 mb-1 font-semibold">Nombre del Item / Talle / Detalle</label>
-              <input type="text" x-model="nuevoItemStock.item" placeholder="Ej: Remera Algodón Negra L, Metros Film DTF Anime" required class="w-full bg-crisDark border border-emerald-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-crisGold" />
+              <input type="text" x-model="nuevoItemStock.item" placeholder="Ej: Remera Algodón Negra L, Metros Film DTF" required class="w-full bg-crisDark border border-emerald-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-crisGold" />
             </div>
             
             <div class="grid grid-cols-2 gap-3">
