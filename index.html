@@ -51,17 +51,18 @@
           colorHex: '#111827',
           talleSeleccionado: 'L',
           
-          // Vista activa en el visor: 'frente' o 'dorso'
-          vistaPrevisualizacion: 'frente',
+          vistaPrevisualizacion: 'frente', // 'frente' o 'dorso'
           
           // Configuración de Frente
           imagenFrente: null,
           escalaFrente: 50,
+          posicionXFrente: 0,
           posicionYFrente: 0,
 
           // Configuración de Dorso
           imagenDorso: null,
           escalaDorso: 60,
+          posicionXDorso: 0,
           posicionYDorso: 0,
 
           observacionesDiseño: '',
@@ -172,10 +173,10 @@
             texto += `📏 *Talle:* ${this.talleSeleccionado}\n\n`;
             
             if (this.imagenFrente) {
-              texto += `🖼️ *FRENTE:* Estampa aprox. ${this.escalaFrente}%\n`;
+              texto += `🖼️ *FRENTE:* Estampa ${this.escalaFrente}% (X: ${this.posicionXFrente}px, Y: ${this.posicionYFrente}px)\n`;
             }
             if (this.imagenDorso) {
-              texto += `🖼️ *DORSO:* Estampa aprox. ${this.escalaDorso}%\n`;
+              texto += `🖼️ *DORSO:* Estampa ${this.escalaDorso}% (X: ${this.posicionXDorso}px, Y: ${this.posicionYDorso}px)\n`;
             }
             
             if (this.observacionesDiseño) {
@@ -468,7 +469,7 @@
                 <span class="text-[11px] font-medium text-center px-2 text-black/60">Sin estampa (Frente)</span>
               </template>
               <template x-if="imagenFrente">
-                <img :src="imagenFrente" alt="Diseño Frente" class="object-contain transition-all duration-75" :style="'width: ' + escalaFrente + '%; transform: translateY(' + posicionYFrente + 'px);'" />
+                <img :src="imagenFrente" alt="Diseño Frente" class="object-contain transition-all duration-75" :style="'width: ' + escalaFrente + '%; transform: translate(' + posicionXFrente + 'px, ' + posicionYFrente + 'px);'" />
               </template>
             </div>
 
@@ -478,13 +479,13 @@
                 <span class="text-[11px] font-medium text-center px-2 text-black/60">Sin estampa (Dorso)</span>
               </template>
               <template x-if="imagenDorso">
-                <img :src="imagenDorso" alt="Diseño Dorso" class="object-contain transition-all duration-75" :style="'width: ' + escalaDorso + '%; transform: translateY(' + posicionYDorso + 'px);'" />
+                <img :src="imagenDorso" alt="Diseño Dorso" class="object-contain transition-all duration-75" :style="'width: ' + escalaDorso + '%; transform: translate(' + posicionXDorso + 'px, ' + posicionYDorso + 'px);'" />
               </template>
             </div>
             
             <span class="text-[10px] mt-3 font-semibold uppercase tracking-widest text-black/50" x-text="'Vista: ' + vistaPrevisualizacion.toUpperCase()"></span>
           </div>
-          <p class="text-[11px] text-emerald-300/60 mt-4 text-center">Visualizá y configurá el Frente y el Dorso de tu prenda.</p>
+          <p class="text-[11px] text-emerald-300/60 mt-4 text-center">Visualizá y ajusta tamaño, ancho y altura de cada estampa.</p>
         </div>
 
         <!-- Columna Derecha: Controles del Customizador -->
@@ -532,7 +533,7 @@
             </div>
           </div>
 
-          <!-- 4. Subir y Configurar Diseños (Frente y Dorso) -->
+          <!-- 4. Subir y Configurar Diseños (Frente y Dorso con X e Y) -->
           <div class="space-y-3 p-3 bg-crisDark/50 border border-emerald-900/60 rounded-2xl">
             <label class="block text-emerald-300/90 font-bold text-sm">4. Diseños (Frente y Dorso)</label>
             
@@ -541,14 +542,20 @@
               <span class="text-crisGold font-bold block mb-1">Frente de la prenda</span>
               <input type="file" accept="image/*" @change="cargarImagenFrente" class="w-full bg-crisDark border border-emerald-800 rounded-xl px-2 py-1.5 text-emerald-200 text-[11px] file:mr-2 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-bold file:bg-crisGold file:text-crisDark cursor-pointer mb-2" />
               <template x-if="imagenFrente">
-                <div class="grid grid-cols-2 gap-2 mt-1">
+                <div class="space-y-2 mt-1">
                   <div>
                     <span class="text-[10px] text-emerald-300/70">Tamaño: <strong x-text="escalaFrente + '%'"></strong></span>
                     <input type="range" min="30" max="95" x-model.number="escalaFrente" class="w-full accent-crisGold cursor-pointer" />
                   </div>
-                  <div>
-                    <span class="text-[10px] text-emerald-300/70">Altura: <strong x-text="posicionYFrente + 'px'"></strong></span>
-                    <input type="range" min="-30" max="30" x-model.number="posicionYFrente" class="w-full accent-crisGold cursor-pointer" />
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <span class="text-[10px] text-emerald-300/70">Horizontal (X): <strong x-text="posicionXFrente + 'px'"></strong></span>
+                      <input type="range" min="-30" max="30" x-model.number="posicionXFrente" class="w-full accent-crisGold cursor-pointer" />
+                    </div>
+                    <div>
+                      <span class="text-[10px] text-emerald-300/70">Vertical (Y): <strong x-text="posicionYFrente + 'px'"></strong></span>
+                      <input type="range" min="-30" max="30" x-model.number="posicionYFrente" class="w-full accent-crisGold cursor-pointer" />
+                    </div>
                   </div>
                 </div>
               </template>
@@ -559,14 +566,20 @@
               <span class="text-crisGold font-bold block mb-1">Dorso / Espalda</span>
               <input type="file" accept="image/*" @change="cargarImagenDorso" class="w-full bg-crisDark border border-emerald-800 rounded-xl px-2 py-1.5 text-emerald-200 text-[11px] file:mr-2 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-bold file:bg-crisGold file:text-crisDark cursor-pointer mb-2" />
               <template x-if="imagenDorso">
-                <div class="grid grid-cols-2 gap-2 mt-1">
+                <div class="space-y-2 mt-1">
                   <div>
                     <span class="text-[10px] text-emerald-300/70">Tamaño: <strong x-text="escalaDorso + '%'"></strong></span>
                     <input type="range" min="30" max="95" x-model.number="escalaDorso" class="w-full accent-crisGold cursor-pointer" />
                   </div>
-                  <div>
-                    <span class="text-[10px] text-emerald-300/70">Altura: <strong x-text="posicionYDorso + 'px'"></strong></span>
-                    <input type="range" min="-30" max="30" x-model.number="posicionYDorso" class="w-full accent-crisGold cursor-pointer" />
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <span class="text-[10px] text-emerald-300/70">Horizontal (X): <strong x-text="posicionXDorso + 'px'"></strong></span>
+                      <input type="range" min="-30" max="30" x-model.number="posicionXDorso" class="w-full accent-crisGold cursor-pointer" />
+                    </div>
+                    <div>
+                      <span class="text-[10px] text-emerald-300/70">Vertical (Y): <strong x-text="posicionYDorso + 'px'"></strong></span>
+                      <input type="range" min="-30" max="30" x-model.number="posicionYDorso" class="w-full accent-crisGold cursor-pointer" />
+                    </div>
                   </div>
                 </div>
               </template>
