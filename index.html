@@ -717,7 +717,7 @@
         x-show="seccionActiva === 'customizador'"
         class="grid grid-cols-1 md:grid-cols-2 gap-6"
       >
-        <!-- Columna Izquierda: Visualizador Real con Mockup Fotorrealista SVG Integrado -->
+        <!-- Columna Izquierda: Visualizador Real con tu Nuevo Mockup Vectorial -->
         <div
           class="bg-gradient-to-b from-[#1E382E] to-[#122A21] border border-emerald-900/50 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center relative min-h-[440px]"
         >
@@ -750,11 +750,11 @@
             </div>
           </div>
 
-          <!-- Contenedor del Mockup con SVG Fotorrealista Optimizado -->
+          <!-- Contenedor del Mockup con tu diseño profesional -->
           <div
             class="w-72 h-96 relative flex items-center justify-center mt-12 shadow-2xl rounded-2xl overflow-hidden border border-emerald-700/30 bg-[#162D24]"
           >
-            <!-- SVG Vectorial con dimensiones explícitas -->
+            <!-- SVG Vectorial basado en tu Mockup (Silueta realista con hombros marcados y caída perfecta) -->
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 600 650"
@@ -770,10 +770,10 @@
                 >
                   <feDropShadow
                     dx="0"
-                    dy="6"
-                    stdDeviation="8"
+                    dy="8"
+                    stdDeviation="10"
                     flood-color="#000000"
-                    flood-opacity="0.35"
+                    flood-opacity="0.4"
                   />
                 </filter>
                 <linearGradient
@@ -783,124 +783,122 @@
                   x2="100%"
                   y2="100%"
                 >
-                  <stop offset="0%" stop-color="#ffffff" stop-opacity="0.2" />
+                  <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22" />
                   <stop offset="50%" stop-color="#000000" stop-opacity="0.05" />
                   <stop
                     offset="100%"
                     stop-color="#000000"
-                    stop-opacity="0.45"
+                    stop-opacity="0.5"
                   />
                 </linearGradient>
               </defs>
 
               <g filter="url(#shadow)">
-                <!-- Silueta base de la remera / prenda -->
+                <!-- Silueta principal idéntica a tu mockup -->
                 <path
-                  d="M 180 50 
-                         Q 250 80 300 80 
-                         Q 350 80 420 50 
-                         L 480 90 
-                         L 540 180 
-                         Q 490 200 470 240 
-                         L 470 580 
-                         Q 470 600 450 600 
-                         L 150 600 
-                         Q 130 600 130 580 
-                         L 130 240 
-                         Q 110 200 60 180 
-                         L 120 90 
+                  d="M 175 45 
+                         Q 240 70 300 70 
+                         Q 360 70 425 45 
+                         L 495 95 
+                         L 535 175 
+                         Q 485 190 465 230 
+                         L 465 580 
+                         Q 465 605 440 605 
+                         L 160 605 
+                         Q 135 605 135 580 
+                         L 135 230 
+                         Q 115 190 65 175 
+                         L 105 95 
                          Z"
                   :fill="colorHex"
-                  stroke="rgba(255,255,255,0.2)"
+                  stroke="rgba(255,255,255,0.22)"
                   stroke-width="3"
                   stroke-linejoin="round"
                 />
 
-                <!-- Capa de volumen e iluminación -->
+                <!-- Capa de iluminación / volumen realista -->
                 <path
-                  d="M 180 50 
-                         Q 250 80 300 80 
-                         Q 350 80 420 50 
-                         L 480 90 
-                         L 540 180 
-                         Q 490 200 470 240 
-                         L 470 580 
-                         Q 470 600 450 600 
-                         L 150 600 
-                         Q 130 600 130 580 
-                         L 130 240 
-                         Q 110 200 60 180 
-                         L 120 90 
+                  d="M 175 45 
+                         Q 240 70 300 70 
+                         Q 360 70 425 45 
+                         L 495 95 
+                         L 535 175 
+                         Q 485 190 465 230 
+                         L 465 580 
+                         Q 465 605 440 605 
+                         L 160 605 
+                         Q 135 605 135 580 
+                         L 135 230 
+                         Q 115 190 65 175 
+                         L 105 95 
                          Z"
                   fill="url(#lighting)"
                   style="mix-blend-mode: overlay"
                 />
 
+                <!-- Costuras de hombros características de tu mockup -->
+                <path
+                  d="M 175 45 L 105 95"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.28)"
+                  stroke-width="2.5"
+                  stroke-dasharray="7,5"
+                />
+                <path
+                  d="M 425 45 L 495 95"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.28)"
+                  stroke-width="2.5"
+                  stroke-dasharray="7,5"
+                />
+
                 <!-- Cuello FRENTE -->
                 <path
                   x-show="vistaPrevisualizacion === 'frente'"
-                  d="M 180 50 
-                         Q 250 140 300 140 
-                         Q 350 140 420 50"
+                  d="M 175 45 
+                         Q 240 135 300 135 
+                         Q 360 135 425 45"
                   fill="none"
-                  stroke="rgba(0,0,0,0.4)"
-                  stroke-width="3.5"
+                  stroke="rgba(0,0,0,0.45)"
+                  stroke-width="4"
                 />
-
                 <path
                   x-show="vistaPrevisualizacion === 'frente'"
-                  d="M 180 50 
-                         Q 250 130 300 130 
-                         Q 350 130 420 50
-                         Q 350 145 300 145
-                         Q 250 145 180 50 Z"
-                  fill="rgba(0,0,0,0.2)"
-                  stroke="rgba(255,255,255,0.15)"
+                  d="M 175 45 
+                         Q 240 120 300 120 
+                         Q 360 120 425 45
+                         Q 360 140 300 140
+                         Q 240 140 175 45 Z"
+                  fill="rgba(0,0,0,0.25)"
+                  stroke="rgba(255,255,255,0.18)"
                   stroke-width="1.5"
                 />
 
                 <!-- Cuello DORSO -->
                 <path
                   x-show="vistaPrevisualizacion === 'dorso'"
-                  d="M 180 50 
-                         Q 250 90 300 90 
-                         Q 350 90 420 50"
+                  d="M 175 45 
+                         Q 240 85 300 85 
+                         Q 360 85 425 45"
                   fill="none"
-                  stroke="rgba(0,0,0,0.3)"
-                  stroke-width="3"
+                  stroke="rgba(0,0,0,0.35)"
+                  stroke-width="3.5"
                 />
-
                 <path
                   x-show="vistaPrevisualizacion === 'dorso'"
-                  d="M 180 50 
-                         Q 250 80 300 80 
-                         Q 350 80 420 50
-                         Q 350 95 300 95
-                         Q 250 95 180 50 Z"
-                  fill="rgba(0,0,0,0.15)"
-                  stroke="rgba(255,255,255,0.15)"
+                  d="M 175 45 
+                         Q 240 75 300 75 
+                         Q 360 75 425 45
+                         Q 360 90 300 90
+                         Q 240 90 175 45 Z"
+                  fill="rgba(0,0,0,0.2)"
+                  stroke="rgba(255,255,255,0.18)"
                   stroke-width="1.5"
-                />
-
-                <!-- Costuras de los hombros -->
-                <path
-                  d="M 180 50 L 120 90"
-                  fill="none"
-                  stroke="rgba(255,255,255,0.2)"
-                  stroke-width="2"
-                  stroke-dasharray="6,4"
-                />
-                <path
-                  d="M 420 50 L 480 90"
-                  fill="none"
-                  stroke="rgba(255,255,255,0.2)"
-                  stroke-width="2"
-                  stroke-dasharray="6,4"
                 />
               </g>
             </svg>
 
-            <!-- VISTA FRENTE (Estampa del usuario alineada al área vectorial) -->
+            <!-- VISTA FRENTE (Estampa del usuario alineada) -->
             <div
               x-show="vistaPrevisualizacion === 'frente'"
               class="absolute w-36 h-40 flex items-center justify-center overflow-hidden z-20"
@@ -922,7 +920,7 @@
               </template>
             </div>
 
-            <!-- VISTA DORSO (Estampa del usuario alineada al área vectorial) -->
+            <!-- VISTA DORSO (Estampa del usuario alineada) -->
             <div
               x-show="vistaPrevisualizacion === 'dorso'"
               class="absolute w-36 h-40 flex items-center justify-center overflow-hidden z-20"
@@ -949,7 +947,7 @@
             x-text="'Vista: ' + vistaPrevisualizacion.toUpperCase()"
           ></span>
           <p class="text-[11px] text-emerald-300/60 mt-1 text-center">
-            Mockup vectorial interactivo optimizado para tu app.
+            Mockup basado en tu diseño profesional con costuras en hombros.
           </p>
         </div>
 
