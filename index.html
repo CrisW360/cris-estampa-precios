@@ -437,7 +437,7 @@
       <!-- ================= SECCIÓN 0: CUSTOMIZADOR PÚBLICO ================= -->
       <div x-show="seccionActiva === 'customizador'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        <!-- Columna Izquierda: Visualizador Real con SVG Garantizado -->
+        <!-- Columna Izquierda: Visualizador Real con Mockup Dinámico (Remera o Tote Bag con mockup2.svg) -->
         <div class="bg-gradient-to-b from-[#1E382E] to-[#122A21] border border-emerald-900/50 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center relative min-h-[440px]">
           
           <!-- Selector de Vista (Frente / Dorso) en la parte superior -->
@@ -450,36 +450,46 @@
             </div>
           </div>
           
-          <!-- Contenedor del Mockup con tamaño explícito y fondo visible -->
+          <!-- Contenedor del Mockup -->
           <div class="w-64 h-80 relative flex items-center justify-center mt-12 shadow-2xl rounded-2xl overflow-hidden border-2 border-emerald-600/40 bg-[#0b1712]">
             
-            <!-- SVG Vectorial con dimensiones CSS explícitas para asegurar renderizado -->
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 650" style="width: 100%; height: 100%; position: absolute; inset: 0;" class="z-10 pointer-events-none drop-shadow-2xl">
-              <defs>
-                <linearGradient id="lighting" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#ffffff" stop-opacity="0.3"/>
-                  <stop offset="50%" stop-color="#000000" stop-opacity="0.1"/>
-                  <stop offset="100%" stop-color="#000000" stop-opacity="0.6"/>
-                </linearGradient>
-              </defs>
+            <!-- OPCIÓN A: Si es Bolsa Tote Bag -> Carga mockup2.svg -->
+            <template x-if="tipoPrenda === 'Bolsas Tote Bags'">
+              <object data="mockup2.svg" type="image/svg+xml" style="width: 100%; height: 100%; position: absolute; inset: 0;" class="z-10 pointer-events-none drop-shadow-2xl">
+                <!-- Fallback por si el navegador requiere imagen o path directo -->
+                <img src="mockup2.svg" alt="Mockup Tote Bag" class="w-full h-full object-contain absolute inset-0 z-10" />
+              </object>
+            </template>
 
-              <!-- Silueta base de la remera con borde claro definitivo -->
-              <path d="M 175 45 Q 250 72 300 72 Q 350 72 425 45 L 485 85 L 545 175 Q 495 195 470 235 L 470 580 Q 470 605 445 605 L 155 605 Q 130 605 130 580 L 130 235 Q 105 195 55 175 L 115 85 Z" 
-                    :fill="colorHex" 
-                    stroke="#ffffff" 
-                    stroke-width="4" 
-                    stroke-linejoin="round" />
+            <!-- OPCIÓN B: Para Remeras y demás prendas -> SVG Vectorial Fotorrealista -->
+            <template x-if="tipoPrenda !== 'Bolsas Tote Bags'">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 650" style="width: 100%; height: 100%; position: absolute; inset: 0;" class="z-10 pointer-events-none drop-shadow-2xl">
+                <defs>
+                  <linearGradient id="lighting" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#ffffff" stop-opacity="0.3"/>
+                    <stop offset="50%" stop-color="#000000" stop-opacity="0.1"/>
+                    <stop offset="100%" stop-color="#000000" stop-opacity="0.6"/>
+                  </linearGradient>
+                </defs>
 
-              <!-- Capa de iluminación y volumen -->
-              <path d="M 175 45 Q 250 72 300 72 Q 350 72 425 45 L 485 85 L 545 175 Q 495 195 470 235 L 470 580 Q 470 605 445 605 L 155 605 Q 130 605 130 580 L 130 235 Q 105 195 55 175 L 115 85 Z" 
-                    fill="url(#lighting)" 
-                    style="mix-blend-mode: overlay;" />
+                <!-- Silueta base de la remera -->
+                <path d="M 175 45 Q 250 72 300 72 Q 350 72 425 45 L 485 85 L 545 175 Q 495 195 470 235 L 470 580 Q 470 605 445 605 L 155 605 Q 130 605 130 580 L 130 235 Q 105 195 55 175 L 115 85 Z" 
+                      :fill="colorHex" 
+                      stroke="#ffffff" 
+                      stroke-width="4" 
+                      stroke-linejoin="round" />
 
-              <!-- Cuello FRENTE -->
-              <path x-show="vistaPrevisualizacion === 'frente'" d="M 175 45 Q 250 135 300 135 Q 350 135 425 45" fill="none" stroke="#ffffff" stroke-width="4" />
-              <!-- Cuello DORSO -->
-              <path x-show="vistaPrevisualizacion === 'dorso'" d="M 175 45 Q 250 85 300 85 Q 350 85 425 45" fill="none" stroke="#ffffff" stroke-width="4" />
-            </svg>
+                <!-- Capa de iluminación y volumen -->
+                <path d="M 175 45 Q 250 72 300 72 Q 350 72 425 45 L 485 85 L 545 175 Q 495 195 470 235 L 470 580 Q 470 605 445 605 L 155 605 Q 130 605 130 580 L 130 235 Q 105 195 55 175 L 115 85 Z" 
+                      fill="url(#lighting)" 
+                      style="mix-blend-mode: overlay;" />
+
+                <!-- Cuello FRENTE -->
+                <path x-show="vistaPrevisualizacion === 'frente'" d="M 175 45 Q 250 135 300 135 Q 350 135 425 45" fill="none" stroke="#ffffff" stroke-width="4" />
+                <!-- Cuello DORSO -->
+                <path x-show="vistaPrevisualizacion === 'dorso'" d="M 175 45 Q 250 85 300 85 Q 350 85 425 45" fill="none" stroke="#ffffff" stroke-width="4" />
+              </svg>
+            </template>
 
             <!-- VISTA FRENTE (Estampa) -->
             <div x-show="vistaPrevisualizacion === 'frente'" class="absolute w-32 h-36 flex items-center justify-center overflow-hidden z-20" style="top: 38%;">
@@ -503,7 +513,7 @@
             
           </div>
           <span class="text-[10px] mt-3 font-semibold uppercase tracking-widest text-emerald-300/80" x-text="'Vista: ' + vistaPrevisualizacion.toUpperCase()"></span>
-          <p class="text-[11px] text-emerald-300/60 mt-1 text-center">Mockup vectorial garantizado.</p>
+          <p class="text-[11px] text-emerald-300/60 mt-1 text-center">Mockup dinámico configurado correctamente.</p>
         </div>
 
         <!-- Columna Derecha: Controles del Customizador -->
