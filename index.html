@@ -67,6 +67,25 @@
 
           observacionesDiseño: '',
 
+          // Modales internos del Taller
+          abrirModalPedido: false,
+          modoEdicionPedido: false,
+          pedidoIdEditando: null,
+          nuevo: { cliente_id: "", detalle: "", seña: 0, total: 0, etiqueta: "General", link_carpeta: "" },
+
+          abrirModalCliente: false,
+          modoEdicionCliente: false,
+          clienteIdEditando: null,
+          nuevoCliente: { nombre: "", telefono: "", email: "", localidad: "Rosario", zona: "", notas: "" },
+
+          abrirModalGasto: false,
+          nuevoGasto: { concepto: "", monto: 0, categoria: "DTF Tercerizado" },
+
+          abrirModalStock: false,
+          modoEdicionStock: false,
+          stockIdEditando: null,
+          nuevoItemStock: { item: "", categoria: "Prendas", stock_actual: 0, unidad: "Unidades", stock_minimo: 2 },
+
           coloresPorPrenda() {
             switch(this.tipoPrenda) {
               case 'Remeras Adulto':
@@ -195,7 +214,7 @@
                 costoDtf: p.costo_dtf,
                 costoPackaging: p.costo_packaging || 0,
                 multiplicador: p.multiplicador,
-                cantidad: 1 // Campo de cantidad de unidades
+                cantidad: 1
               }));
             } catch (e) { console.error(e); }
           },
@@ -222,11 +241,9 @@
 
           calcularCostoUnitario(p) { return (Number(p.costoPrenda) || 0) + (Number(p.costoDtf) || 0) + (Number(p.costoPackaging) || 0); },
           calcularPrecioUnitario(p) { return this.calcularCostoUnitario(p) * (Number(p.multiplicador) || 2.0); },
-          
           calcularCostoTotal(p) { return this.calcularCostoUnitario(p) * (Number(p.cantidad) || 1); },
           calcularPrecioTotal(p) { return this.calcularPrecioUnitario(p) * (Number(p.cantidad) || 1); },
           calcularGananciaTotal(p) { return this.calcularPrecioTotal(p) - this.calcularCostoTotal(p); },
-
           formatMoney(val) { return "$ " + Math.round(val || 0).toLocaleString("es-AR"); },
 
           get totalVentas() { return this.pedidos.reduce((acc, p) => acc + Number(p.total || 0), 0); },
@@ -248,20 +265,32 @@
           },
 
           abrirCrearPedido() { this.modoEdicionPedido = false; this.nuevo = { cliente_id: "", detalle: "", seña: 0, total: 0, etiqueta: "General", link_carpeta: "" }; this.abrirModalPedido = true; },
+          prepararEdicionPedido(p) { this.modoEdicionPedido = true; this.pedidoIdEditando = p.id; this.nuevo = { cliente_id: p.cliente_id || "", detalle: p.detalle, seña: p.seña, total: p.total, etiqueta: p.etiqueta, link_carpeta: p.link_carpeta || "" }; this.abrirModalPedido = true; },
           async guardarPedido() {
-            let payload = { cliente_id: this.nuevo.cliente_id || null, detalle: this.nuevo.detalle, seña: Number(this.nuevo.seña) || 0, total: Number(this.nuevo.total) || 0, etiqueta: this.nuevo.etiqueta || 'General', link_carpeta: this.nuevo.link_carpeta.trim() || null, estado: 'Pendiente' };
-            await supabaseClient.from("pedidos").insert([payload]);
+            let payload = { cliente_id: this.nuevo.cliente_id || null, detalle: this.nuevo.detalle, seña: Number(this.nuevo.seña) || 0, total: Number(this.nuevo.total) || 0, etiqueta: this.nuevo.etiqueta || 'General', link_carpeta: this.nuevo.link_carpeta.trim() || null };
+            if (this.modoEdicionPedido) {
+              await supabaseClient.from("pedidos").update(payload).eq("id", this.pedidoIdEditando);
+            } else {
+              payload.estado = 'Pendiente';
+              await supabaseClient.from("pedidos").insert([payload]);
+            }
             this.abrirModalPedido = false;
             await this.cargarPedidos();
           },
           async eliminarPedido(id) { if (confirm("¿Eliminar pedido?")) { await supabaseClient.from("pedidos").delete().eq("id", id); await this.cargarPedidos(); } },
 
-          abrirCrearCliente() { this.nuevoCliente = { nombre: "", telefono: "", email: "", localidad: "Rosario", zona: "", notas: "" }; this.abrirModalCliente = true; },
+          abrirCrearCliente() { this.modoEdicionCliente = false; this.nuevoCliente = { nombre: "", telefono: "", email: "", localidad: "Rosario", zona: "", notas: "" }; this.abrirModalCliente = true; },
+          prepararEdicionCliente(c) { this.modoEdicionCliente = true; this.clienteIdEditando = c.id; this.nuevoCliente = { ...c }; this.abrirModalCliente = true; },
           async guardarCliente() {
-            await supabaseClient.from("clientes").insert([this.nuevoCliente]);
+            if (this.modoEdicionCliente) {
+              await supabaseClient.from("clientes").update(this.nuevoCliente).eq("id", this.clienteIdEditando);
+            } else {
+              await supabaseClient.from("clientes").insert([this.nuevoCliente]);
+            }
             this.abrirModalCliente = false;
             await this.cargarClientes();
           },
+          async eliminarCliente(id) { if (confirm("¿Eliminar cliente?")) { await supabaseClient.from("clientes").delete().eq("id", id); await this.cargarClientes(); } },
 
           async guardarGasto() {
             await supabaseClient.from("gastos").insert([{ concepto: this.nuevoGasto.concepto, monto: Number(this.nuevoGasto.monto) || 0, categoria: this.nuevoGasto.categoria }]);
@@ -270,9 +299,15 @@
           },
           async eliminarGasto(id) { await supabaseClient.from("gastos").delete().eq("id", id); await this.cargarGastos(); },
 
-          abrirCrearStock() { this.nuevoItemStock = { item: "", categoria: "Prendas", stock_actual: 0, unidad: "Unidades", stock_minimo: 2 }; this.abrirModalStock = true; },
+          abrirCrearStock() { this.modoEdicionStock = false; this.nuevoItemStock = { item: "", categoria: "Prendas", stock_actual: 0, unidad: "Unidades", stock_minimo: 2 }; this.abrirModalStock = true; },
+          prepararEdicionStock(i) { this.modoEdicionStock = true; this.stockIdEditando = i.id; this.nuevoItemStock = { ...i }; this.abrirModalStock = true; },
           async guardarStockItem() {
-            await supabaseClient.from("inventario").insert([this.nuevoItemStock]);
+            let payload = { item: this.nuevoItemStock.item, categoria: this.nuevoItemStock.categoria, stock_actual: Number(this.nuevoItemStock.stock_actual) || 0, unidad: this.nuevoItemStock.unidad, stock_minimo: Number(this.nuevoItemStock.stock_minimo) || 2 };
+            if (this.modoEdicionStock) {
+              await supabaseClient.from("inventario").update(payload).eq("id", this.stockIdEditando);
+            } else {
+              await supabaseClient.from("inventario").insert([payload]);
+            }
             this.abrirModalStock = false;
             await this.cargarInventario();
           },
@@ -335,12 +370,9 @@
       <!-- ================= CUSTOMIZADOR ================= -->
       <div x-show="seccionActiva === 'customizador'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        <!-- VISUALIZADOR CON CAMBIO DE MOCKUP SEGÚN PRODUCTO -->
         <div class="bg-gradient-to-b from-[#1E382E] to-[#122A21] border border-emerald-900/50 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center relative min-h-[440px]">
-          
           <div class="absolute top-4 left-4 right-4 flex justify-between items-center px-2 z-30">
             <span class="text-[10px] uppercase font-bold tracking-wider bg-crisDark text-crisGold px-3 py-1 rounded-xl border border-emerald-800 shadow-md" x-text="tipoPrenda + ' (' + colorPrenda + ')'"></span>
-            
             <div class="flex bg-crisDark/90 p-1 rounded-xl border border-emerald-800/80 shadow-md">
               <button @click="vistaPrevisualizacion = 'frente'" :class="vistaPrevisualizacion === 'frente' ? 'bg-crisGold text-crisDark font-bold' : 'text-emerald-300/70'" class="px-3 py-1 rounded-lg text-[10px] uppercase transition">Frente</button>
               <button @click="vistaPrevisualizacion = 'dorso'" :class="vistaPrevisualizacion === 'dorso' ? 'bg-crisGold text-crisDark font-bold' : 'text-emerald-300/70'" class="px-3 py-1 rounded-lg text-[10px] uppercase transition">Dorso</button>
@@ -365,13 +397,11 @@
               </g>
             </svg>
 
-            <!-- MOCKUP EXCLUSIVO TOTE BAGS (Basado en tu imagen) -->
+            <!-- MOCKUP EXCLUSIVO TOTE BAGS -->
             <svg x-show="tipoPrenda === 'Bolsas Tote Bags'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 650" class="w-64 h-80 z-10 pointer-events-none drop-shadow-2xl">
               <g filter="url(#shadow)">
-                <!-- Manijas de la Tote Bag -->
                 <path d="M 220 180 Q 220 70 300 70 Q 380 70 380 180" fill="none" :stroke="colorHex" stroke-width="22" stroke-linecap="round"/>
                 <path d="M 235 180 Q 235 90 300 90 Q 365 90 365 180" fill="none" stroke="#162D24" stroke-width="12" stroke-linecap="round"/>
-                <!-- Cuerpo de la Bolsa -->
                 <rect x="140" y="180" width="320" height="380" rx="12" :fill="colorHex" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
                 <rect x="140" y="180" width="320" height="380" rx="12" fill="url(#lighting)" style="mix-blend-mode: overlay;"/>
               </g>
@@ -388,9 +418,7 @@
               <template x-if="!imagenDorso"><span class="text-[10px] font-bold text-center px-3 py-1.5 text-neutral-200 bg-black/60 rounded-xl border border-white/20">Sin estampa (Dorso)</span></template>
               <template x-if="imagenDorso"><img :src="imagenDorso" class="object-contain drop-shadow-2xl" :style="'width: ' + ((anchoDorsoCm / 32) * 100) + '%; transform: translate(' + posicionXDorso + 'px, ' + posicionYDorso + 'px);'" /></template>
             </div>
-            
           </div>
-          <span class="text-[10px] mt-3 font-semibold uppercase tracking-widest text-emerald-300/80" x-text="'Vista: ' + vistaPrevisualizacion.toUpperCase()"></span>
         </div>
 
         <!-- CONTROLES -->
@@ -450,13 +478,13 @@
               <div><span class="text-emerald-200/70">Multiplicador</span><input type="number" step="0.1" x-model.number="prod.multiplicador" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-1.5 text-right text-white font-medium" /></div>
             </div>
 
-            <!-- Selector de Cantidad de Unidades -->
+            <!-- Cantidad de Unidades -->
             <div class="p-2.5 bg-crisDark/60 rounded-xl border border-emerald-800/60 flex justify-between items-center text-xs">
               <span class="text-emerald-300 font-bold">Cantidad de Unidades:</span>
               <input type="number" min="1" x-model.number="prod.cantidad" class="w-20 bg-crisCard border border-emerald-700 rounded-lg p-1 text-center text-white font-black text-sm" />
             </div>
 
-            <!-- Desglose Final con Costo y Ganancia Separados -->
+            <!-- Desglose Final Separado -->
             <div class="mt-4 pt-3 border-t border-emerald-900/40 space-y-1.5 text-xs">
               <div class="flex justify-between text-emerald-300/70">
                 <span>Costo Total (Tirada):</span>
@@ -479,13 +507,115 @@
         </div>
       </div>
 
-      <!-- RESTO DE SECCIONES (Pedidos, Clientes, Finanzas, Stock, Modales) se mantienen operativas -->
-      <div x-show="seccionActiva === 'pedidos'" style="display: none;"><div class="bg-crisCard p-6 rounded-3xl"><h2 class="text-white font-bold mb-4">Módulo de Pedidos</h2><button @click="abrirCrearPedido()" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl text-xs font-bold">+ Nuevo Pedido</button></div></div>
-      <div x-show="seccionActiva === 'clientes'" style="display: none;"><div class="bg-crisCard p-6 rounded-3xl"><h2 class="text-white font-bold mb-4">Agenda de Clientes</h2><button @click="abrirCrearCliente()" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl text-xs font-bold">+ Nuevo Cliente</button></div></div>
-      <div x-show="seccionActiva === 'finanzas'" style="display: none;"><div class="bg-crisCard p-6 rounded-3xl"><h2 class="text-white font-bold mb-4">Control de Finanzas</h2></div></div>
-      <div x-show="seccionActiva === 'stock'" style="display: none;"><div class="bg-crisCard p-6 rounded-3xl"><h2 class="text-white font-bold mb-4">Gestión de Stock</h2><button @click="abrirCrearStock()" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl text-xs font-bold">+ Nuevo Item</button></div></div>
+      <!-- ================= MÓDULO PEDIDOS ================= -->
+      <div x-show="seccionActiva === 'pedidos'" style="display: none;">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-black text-white">Seguimiento de Pedidos</h2>
+          <button @click="abrirCrearPedido()" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl text-sm font-bold shadow">+ Nuevo Pedido</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <template x-for="p in pedidos" :key="p.id">
+            <div class="bg-crisCard border border-emerald-900/40 rounded-3xl p-5 shadow-2xl flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-center mb-3">
+                  <span class="text-[10px] uppercase font-black bg-crisDark text-crisGold px-2.5 py-1 rounded-xl border border-emerald-800" x-text="p.etiqueta || 'General'"></span>
+                  <span class="text-[10px] uppercase font-bold px-2.5 py-1 rounded-full" :class="{'bg-yellow-900/50 text-yellow-300': p.estado === 'Pendiente', 'bg-blue-900/50 text-blue-300': p.estado === 'Diseño', 'bg-purple-900/50 text-purple-300': p.estado === 'Produccion', 'bg-emerald-900/50 text-emerald-300': p.estado === 'Listo', 'bg-gray-800 text-gray-400': p.estado === 'Entregado'}" x-text="p.estado"></span>
+                </div>
+                <div class="mb-4">
+                  <template x-if="p.link_carpeta"><a :href="p.link_carpeta" target="_blank" class="w-full bg-crisDark hover:bg-emerald-950 border border-emerald-800 rounded-2xl py-2 px-3 flex items-center justify-center gap-2 text-xs font-bold text-crisGold">📁 Abrir Carpeta Drive</a></template>
+                </div>
+                <div class="mb-4">
+                  <h3 class="font-bold text-white text-base" x-text="p.clientes ? p.clientes.nombre : 'Cliente Genérico'"></h3>
+                  <p class="text-xs text-crisGold mb-2" x-text="p.clientes ? (p.clientes.localidad + (p.clientes.zona ? ' (' + p.clientes.zona + ')' : '')) : ''"></p>
+                  <p class="text-sm text-emerald-200/80" x-text="p.detalle"></p>
+                </div>
+              </div>
+              <div class="pt-3 border-t border-emerald-900/40 flex flex-col gap-2 text-xs">
+                <div class="flex justify-between items-center">
+                  <span class="text-emerald-300/60">Total: <strong class="text-white" x-text="'$ ' + Number(p.total).toLocaleString('es-AR')"></strong></span>
+                  <select x-model="p.estado" @change="actualizarEstado(p)" class="bg-crisDark text-emerald-200 border border-emerald-800 rounded-xl px-2 py-1 text-xs">
+                    <option value="Pendiente">Pendiente</option><option value="Diseño">Diseño</option><option value="Produccion">Producción</option><option value="Listo">Listo</option><option value="Entregado">Entregado</option>
+                  </select>
+                </div>
+                <div class="flex justify-end gap-2">
+                  <button @click="prepararEdicionPedido(p)" class="text-emerald-300 bg-emerald-950 px-3 py-1 rounded-lg border border-emerald-800">Editar</button>
+                  <button @click="eliminarPedido(p.id)" class="text-red-300 bg-red-950 px-3 py-1 rounded-lg border border-red-900">Eliminar</button>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <!-- ================= MÓDULO CLIENTES ================= -->
+      <div x-show="seccionActiva === 'clientes'" style="display: none;">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-black text-white">Agenda de Clientes</h2>
+          <button @click="abrirCrearCliente()" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl text-sm font-bold shadow">+ Nuevo Cliente</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <template x-for="c in clientes" :key="c.id">
+            <div class="bg-crisCard border border-emerald-900/40 rounded-2xl p-4 shadow-xl flex flex-col justify-between">
+              <div>
+                <h3 class="font-bold text-white text-base" x-text="c.nombre"></h3>
+                <p class="text-xs text-crisGold mb-1" x-text="c.localidad + (c.zona ? ' (' + c.zona + ')' : '')"></p>
+                <p class="text-xs text-emerald-200/60" x-text="c.telefono || ''"></p>
+              </div>
+              <div class="pt-3 border-t border-emerald-900/40 flex justify-end gap-2 text-xs">
+                <button @click="prepararEdicionCliente(c)" class="text-emerald-300 bg-emerald-950 px-3 py-1 rounded-lg border border-emerald-800">Editar</button>
+                <button @click="eliminarCliente(c.id)" class="text-red-300 bg-red-950 px-3 py-1 rounded-lg border border-red-900">Eliminar</button>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <!-- ================= MÓDULO FINANZAS ================= -->
+      <div x-show="seccionActiva === 'finanzas'" style="display: none;">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-black text-white">Finanzas y Caja</h2>
+          <button @click="abrirModalGasto = true" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl text-sm font-bold shadow">+ Registrar Gasto</button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div class="bg-crisCard border border-emerald-900/50 rounded-2xl p-4 shadow"><p class="text-[11px] uppercase text-emerald-300/60 font-semibold">Ventas Totales</p><p class="text-xl font-black text-white" x-text="formatMoney(totalVentas)"></p></div>
+          <div class="bg-crisCard border border-emerald-900/50 rounded-2xl p-4 shadow"><p class="text-[11px] uppercase text-emerald-300/60 font-semibold">Señas en Caja</p><p class="text-xl font-black text-emerald-300" x-text="formatMoney(totalSeñasRecibidas)"></p></div>
+          <div class="bg-crisCard border border-emerald-900/50 rounded-2xl p-4 shadow"><p class="text-[11px] uppercase text-crisGold font-semibold">Saldo a Cobrar</p><p class="text-xl font-black text-crisGold" x-text="formatMoney(totalSaldoPendiente)"></p></div>
+          <div class="bg-crisCard border border-emerald-900/50 rounded-2xl p-4 shadow"><p class="text-[11px] uppercase text-red-300 font-semibold">Gastos</p><p class="text-xl font-black text-red-300" x-text="formatMoney(totalGastos)"></p></div>
+        </div>
+        <div class="bg-gradient-to-r from-emerald-950 to-crisCard border border-emerald-700/40 rounded-3xl p-6 shadow-2xl mb-8 flex justify-between items-center">
+          <div><h3 class="text-sm uppercase font-bold text-emerald-300/80">Balance General</h3><p class="text-xs text-emerald-200/60">Ventas menos gastos operativos.</p></div>
+          <div class="text-right"><p class="text-xs uppercase text-crisGold font-semibold">Ganancia Neta</p><p class="text-3xl font-black text-white" x-text="formatMoney(gananciaNeta)"></p></div>
+        </div>
+      </div>
+
+      <!-- ================= MÓDULO STOCK ================= -->
+      <div x-show="seccionActiva === 'stock'" style="display: none;">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-black text-white">Stock e Inventario</h2>
+          <button @click="abrirCrearStock()" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl text-sm font-bold shadow">+ Nuevo Item</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <template x-for="i in inventario" :key="i.id">
+            <div class="bg-crisCard border border-emerald-900/40 rounded-3xl p-5 shadow flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-start mb-2"><span class="text-[10px] bg-crisDark text-crisGold px-2.5 py-1 rounded-xl border border-emerald-800" x-text="i.categoria"></span><span class="text-[10px] px-2 py-0.5 rounded-full font-bold" :class="Number(i.stock_actual) <= Number(i.stock_minimo) ? 'bg-red-950 text-red-300' : 'bg-emerald-950 text-emerald-300'" x-text="Number(i.stock_actual) <= Number(i.stock_minimo) ? '⚠️ Reponer' : '✓ OK'"></span></div>
+                <h3 class="font-bold text-white text-base mb-3" x-text="i.item"></h3>
+                <div class="bg-crisDark/60 border border-emerald-900/50 rounded-2xl p-3 flex justify-between items-center mb-4">
+                  <div><p class="text-[10px] text-emerald-300/60 font-semibold">DISPONIBLE</p><p class="text-xl font-black text-white"><span x-text="i.stock_actual"></span> <span class="text-xs text-emerald-300/70" x-text="i.unidad"></span></p></div>
+                  <div class="flex items-center gap-1.5"><button @click="ajustarStockRapido(i, -1)" class="bg-emerald-950 text-emerald-300 w-8 h-8 rounded-xl border border-emerald-800 font-bold">-</button><button @click="ajustarStockRapido(i, 1)" class="bg-emerald-950 text-emerald-300 w-8 h-8 rounded-xl border border-emerald-800 font-bold">+</button></div>
+                </div>
+              </div>
+              <div class="pt-3 border-t border-emerald-900/40 flex justify-end gap-2 text-xs">
+                <button @click="prepararEdicionStock(i)" class="text-emerald-300 bg-emerald-950 px-3 py-1 rounded-lg border border-emerald-800">Editar</button>
+                <button @click="eliminarItemStock(i.id)" class="text-red-300 bg-red-950 px-3 py-1 rounded-lg border border-red-900">Eliminar</button>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
 
       <!-- MODALES -->
+      <!-- Modal Login -->
       <div x-show="abrirModalLogin" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50" style="display: none;">
         <div class="bg-crisCard border border-emerald-900 rounded-3xl p-6 w-full max-w-md relative" @click.away="abrirModalLogin = false">
           <button @click="abrirModalLogin = false" class="absolute top-4 right-4 text-emerald-400 font-bold">✕</button>
@@ -494,6 +624,59 @@
             <div><label class="text-emerald-300 mb-1 block">Correo</label><input type="email" x-model="emailLogin" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
             <div><label class="text-emerald-300 mb-1 block">Contraseña</label><input type="password" x-model="passwordLogin" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
             <button type="submit" class="w-full bg-crisGold text-crisDark py-2.5 rounded-xl font-bold">Ingresar</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal Pedido -->
+      <div x-show="abrirModalPedido" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-crisCard border border-emerald-900 rounded-3xl p-6 w-full max-w-md relative" @click.away="abrirModalPedido = false">
+          <h3 class="text-lg font-bold text-white mb-4">Gestión de Pedido</h3>
+          <form @submit.prevent="guardarPedido()" class="space-y-3 text-xs">
+            <div><label class="text-emerald-300">Cliente</label><select x-model="nuevo.cliente_id" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white"><option value="">Seleccionar...</option><template x-for="c in clientes" :key="c.id"><option :value="c.id" x-text="c.nombre"></option></template></select></div>
+            <div><label class="text-emerald-300">Detalle</label><textarea x-model="nuevo.detalle" required rows="2" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white"></textarea></div>
+            <div class="grid grid-cols-2 gap-2"><div><label class="text-emerald-300">Seña ($)</label><input type="number" x-model="nuevo.seña" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div><div><label class="text-emerald-300">Total ($)</label><input type="number" x-model="nuevo.total" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div></div>
+            <div><label class="text-emerald-300">Link Drive</label><input type="text" x-model="nuevo.link_carpeta" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+            <div class="flex justify-end gap-2 pt-2"><button type="button" @click="abrirModalPedido = false" class="bg-gray-800 text-gray-300 px-4 py-2 rounded-xl">Cancelar</button><button type="submit" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl font-bold">Guardar</button></div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal Cliente -->
+      <div x-show="abrirModalCliente" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-crisCard border border-emerald-900 rounded-3xl p-6 w-full max-w-md relative" @click.away="abrirModalCliente = false">
+          <h3 class="text-lg font-bold text-white mb-4">Gestión de Cliente</h3>
+          <form @submit.prevent="guardarCliente()" class="space-y-3 text-xs">
+            <div><label class="text-emerald-300">Nombre</label><input type="text" x-model="nuevoCliente.nombre" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+            <div><label class="text-emerald-300">Teléfono</label><input type="text" x-model="nuevoCliente.telefono" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+            <div><label class="text-emerald-300">Localidad</label><input type="text" x-model="nuevoCliente.localidad" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+            <div class="flex justify-end gap-2 pt-2"><button type="button" @click="abrirModalCliente = false" class="bg-gray-800 text-gray-300 px-4 py-2 rounded-xl">Cancelar</button><button type="submit" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl font-bold">Guardar</button></div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal Gasto -->
+      <div x-show="abrirModalGasto" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-crisCard border border-emerald-900 rounded-3xl p-6 w-full max-w-md relative" @click.away="abrirModalGasto = false">
+          <h3 class="text-lg font-bold text-white mb-4">Registrar Gasto</h3>
+          <form @submit.prevent="guardarGasto()" class="space-y-3 text-xs">
+            <div><label class="text-emerald-300">Concepto</label><input type="text" x-model="nuevoGasto.concepto" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+            <div><label class="text-emerald-300">Monto ($)</label><input type="number" x-model="nuevoGasto.monto" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+            <div><label class="text-emerald-300">Categoría</label><select x-model="nuevoGasto.categoria" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white"><option value="DTF Tercerizado">DTF Tercerizado</option><option value="Insumos">Insumos</option><option value="Servicios / Varios">Servicios / Varios</option></select></div>
+            <div class="flex justify-end gap-2 pt-2"><button type="button" @click="abrirModalGasto = false" class="bg-gray-800 text-gray-300 px-4 py-2 rounded-xl">Cancelar</button><button type="submit" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl font-bold">Guardar</button></div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal Stock -->
+      <div x-show="abrirModalStock" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-crisCard border border-emerald-900 rounded-3xl p-6 w-full max-w-md relative" @click.away="abrirModalStock = false">
+          <h3 class="text-lg font-bold text-white mb-4">Gestión de Stock</h3>
+          <form @submit.prevent="guardarStockItem()" class="space-y-3 text-xs">
+            <div><label class="text-emerald-300">Item</label><input type="text" x-model="nuevoItemStock.item" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+            <div><label class="text-emerald-300">Categoría</label><input type="text" x-model="nuevoItemStock.categoria" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+            <div class="grid grid-cols-2 gap-2"><div><label class="text-emerald-300">Stock Actual</label><input type="number" x-model="nuevoItemStock.stock_actual" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div><div><label class="text-emerald-300">Mínimo</label><input type="number" x-model="nuevoItemStock.stock_minimo" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div></div>
+            <div class="flex justify-end gap-2 pt-2"><button type="button" @click="abrirModalStock = false" class="bg-gray-800 text-gray-300 px-4 py-2 rounded-xl">Cancelar</button><button type="submit" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl font-bold">Guardar</button></div>
           </form>
         </div>
       </div>
