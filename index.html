@@ -67,37 +67,25 @@
 
           observacionesDiseño: '',
 
-          // Modales del Taller
-          abrirModalPedido: false,
-          modoEdicionPedido: false,
-          pedidoIdEditando: null,
-          nuevo: { cliente_id: "", detalle: "", seña: 0, total: 0, etiqueta: "General", link_carpeta: "" },
-
-          abrirModalCliente: false,
-          modoEdicionCliente: false,
-          clienteIdEditando: null,
-          nuevoCliente: { nombre: "", telefono: "", email: "", localidad: "Rosario", zona: "", notas: "" },
-
-          abrirModalGasto: false,
-          nuevoGasto: { concepto: "", monto: 0, categoria: "DTF Tercerizado" },
-
-          abrirModalStock: false,
-          modoEdicionStock: false,
-          stockIdEditando: null,
-          nuevoItemStock: { item: "", categoria: "Prendas", stock_actual: 0, unidad: "Unidades", stock_minimo: 2 },
-
           // Paleta de colores filtrada
           coloresPorPrenda() {
             switch(this.tipoPrenda) {
               case 'Remeras Adulto':
                 return [
-                  { nombre: 'Blanco', hex: '#ffffff' }, { nombre: 'Melange Medio', hex: '#9ca3af' },
-                  { nombre: 'Melange Oscuro', hex: '#374151' }, { nombre: 'Negro', hex: '#111111' },
-                  { nombre: 'Azul Marino', hex: '#1e3a8a' }, { nombre: 'Azul Francia', hex: '#2563eb' },
-                  { nombre: 'Azul Aero', hex: '#3b82f6' }, { nombre: 'Crema', hex: '#fef08a' },
-                  { nombre: 'Rojo', hex: '#dc2626' }, { nombre: 'Lila', hex: '#c4b5fd' },
-                  { nombre: 'Violeta', hex: '#7c3aed' }, { nombre: 'Amarillo Reactivo', hex: '#facc15' },
-                  { nombre: 'Wine', hex: '#831843' }, { nombre: 'Naranja Pop', hex: '#f97316' }
+                  { nombre: 'Blanco', hex: '#ffffff' },
+                  { nombre: 'Melange Medio', hex: '#9ca3af' },
+                  { nombre: 'Melange Oscuro', hex: '#374151' },
+                  { nombre: 'Negro', hex: '#111111' },
+                  { nombre: 'Azul Marino', hex: '#1e3a8a' },
+                  { nombre: 'Azul Francia', hex: '#2563eb' },
+                  { nombre: 'Azul Aero', hex: '#3b82f6' },
+                  { nombre: 'Crema', hex: '#fef08a' },
+                  { nombre: 'Rojo', hex: '#dc2626' },
+                  { nombre: 'Lila', hex: '#c4b5fd' },
+                  { nombre: 'Violeta', hex: '#7c3aed' },
+                  { nombre: 'Amarillo Reactivo', hex: '#facc15' },
+                  { nombre: 'Wine', hex: '#831843' },
+                  { nombre: 'Naranja Pop', hex: '#f97316' }
                 ];
               case 'Remeras Niños':
                 return [
@@ -167,22 +155,38 @@
 
           cargarImagenFrente(event) {
             const file = event.target.files[0];
-            if (file) { this.imagenFrente = URL.createObjectURL(file); }
+            if (file) {
+              this.imagenFrente = URL.createObjectURL(file);
+            }
           },
 
           cargarImagenDorso(event) {
             const file = event.target.files[0];
-            if (file) { this.imagenDorso = URL.createObjectURL(file); }
+            if (file) {
+              this.imagenDorso = URL.createObjectURL(file);
+            }
           },
 
           enviarPedidoWhatsApp() {
             let texto = `Hola Cris! Estuve armando este diseño en la web de Cris Estampa:\n\n`;
             texto += `*Prenda:* ${this.tipoPrenda} (${this.colorPrenda})\n`;
             texto += `*Talle:* ${this.talleSeleccionado}\n\n`;
-            if (this.imagenFrente) texto += `*FRENTE:* Estampa de ${this.anchoFrenteCm} cm\n`;
-            if (this.imagenDorso) texto += `*DORSO:* Estampa de ${this.anchoDorsoCm} cm\n`;
-            if (this.observacionesDiseño) texto += `*Notas:* ${this.observacionesDiseño}\n`;
-            let url = `https://wa.me/5493413457465?text=` + encodeURIComponent(texto);
+            
+            if (this.imagenFrente) {
+              texto += `*FRENTE:* Estampa de ${this.anchoFrenteCm} cm de ancho (Pos X: ${this.posicionXFrente}px, Y: ${this.posicionYFrente}px)\n`;
+            }
+            if (this.imagenDorso) {
+              texto += `*DORSO:* Estampa de ${this.anchoDorsoCm} cm de ancho (Pos X: ${this.posicionXDorso}px, Y: ${this.posicionYDorso}px)\n`;
+            }
+            
+            if (this.observacionesDiseño) {
+              texto += `\n*Notas:* ${this.observacionesDiseño}\n`;
+            }
+            texto += `\nTe envío los detalles para coordinar el pedido. ¡Gracias!`;
+            
+            let tuNumero = "5493413457465"; 
+            
+            let url = `https://wa.me/${tuNumero}?text=` + encodeURIComponent(texto);
             window.open(url, '_blank');
           },
 
@@ -192,6 +196,7 @@
               this.sesionIniciada = true;
               await this.cargarDatosCompletos();
             }
+
             supabaseClient.auth.onAuthStateChange(async (event, session) => {
               if (session) {
                 this.sesionIniciada = true;
@@ -210,6 +215,7 @@
                 password: this.passwordLogin,
               });
               if (error) throw error;
+              
               this.sesionIniciada = true;
               this.abrirModalLogin = false;
               this.seccionActiva = 'calculadora';
@@ -217,7 +223,8 @@
               this.mensaje = "¡Bienvenido al panel de Cris Estampa!";
               setTimeout(() => (this.mensaje = ""), 3000);
             } catch (e) {
-              alert("Error al iniciar sesión. Verificá tus datos.");
+              console.error("Error de autenticación:", e.message);
+              alert("Error al iniciar sesión. Verificá tu correo y contraseña.");
             } finally {
               this.cargandoLogin = false;
             }
@@ -227,6 +234,8 @@
             await supabaseClient.auth.signOut();
             this.sesionIniciada = false;
             this.seccionActiva = 'customizador';
+            this.emailLogin = "";
+            this.passwordLogin = "";
           },
 
           async cargarDatosCompletos() {
@@ -246,39 +255,46 @@
                 nombre: p.nombre,
                 costoPrenda: p.costo_prenda,
                 costoDtf: p.costo_dtf,
-                costoPackaging: p.costo_packaging || 0,
+                costoPackaging: p.costo_packaging,
                 multiplicador: p.multiplicador,
-                cantidad: 1 // Cantidad de unidades por defecto
               }));
             } catch (e) { console.error(e); }
           },
 
           async cargarClientes() {
-            let { data } = await supabaseClient.from("clientes").select("*").order("nombre");
-            this.clientes = data || [];
+            try {
+              let { data, error } = await supabaseClient.from("clientes").select("*").order("nombre");
+              if (error) throw error;
+              this.clientes = data || [];
+            } catch (e) { console.error(e); }
           },
 
           async cargarPedidos() {
-            let { data } = await supabaseClient.from("pedidos").select("*, clientes(nombre, telefono, localidad, zona)").order("fecha_creacion", { ascending: false });
-            this.pedidos = data || [];
+            try {
+              let { data, error } = await supabaseClient.from("pedidos").select("*, clientes(nombre, telefono, localidad, zona)").order("fecha_creacion", { ascending: false });
+              if (error) throw error;
+              this.pedidos = data || [];
+            } catch (e) { console.error(e); }
           },
 
           async cargarGastos() {
-            let { data } = await supabaseClient.from("gastos").select("*").order("fecha", { ascending: false });
-            this.gastos = data || [];
+            try {
+              let { data, error } = await supabaseClient.from("gastos").select("*").order("fecha", { ascending: false });
+              if (error) throw error;
+              this.gastos = data || [];
+            } catch (e) { console.error(e); }
           },
 
           async cargarInventario() {
-            let { data } = await supabaseClient.from("inventario").select("*").order("item");
-            this.inventario = data || [];
+            try {
+              let { data, error } = await supabaseClient.from("inventario").select("*").order("item");
+              if (error) throw error;
+              this.inventario = data || [];
+            } catch (e) { console.error(e); }
           },
 
-          // Funciones de cálculo actualizadas con cantidad y separación costo/ganancia
-          calcularCostoUnitario(p) { return (Number(p.costoPrenda) || 0) + (Number(p.costoDtf) || 0) + (Number(p.costoPackaging) || 0); },
-          calcularPrecioUnitario(p) { return this.calcularCostoUnitario(p) * (Number(p.multiplicador) || 2.0); },
-          calcularCostoTotal(p) { return this.calcularCostoUnitario(p) * (Number(p.cantidad) || 1); },
-          calcularPrecioTotal(p) { return this.calcularPrecioUnitario(p) * (Number(p.cantidad) || 1); },
-          calcularGananciaTotal(p) { return this.calcularPrecioTotal(p) - this.calcularCostoTotal(p); },
+          calcularTotal(p) { return (p.costoPrenda || 0) + (p.costoDtf || 0) + (p.costoPackaging || 0); },
+          calcularPrecio(p) { return this.calcularTotal(p) * (p.multiplicador || 2.0); },
           formatMoney(val) { return "$ " + Math.round(val || 0).toLocaleString("es-AR"); },
 
           get totalVentas() { return this.pedidos.reduce((acc, p) => acc + Number(p.total || 0), 0); },
@@ -301,6 +317,7 @@
 
           abrirCrearPedido() { this.modoEdicionPedido = false; this.nuevo = { cliente_id: "", detalle: "", seña: 0, total: 0, etiqueta: "General", link_carpeta: "" }; this.abrirModalPedido = true; },
           prepararEdicionPedido(p) { this.modoEdicionPedido = true; this.pedidoIdEditando = p.id; this.nuevo = { cliente_id: p.cliente_id || "", detalle: p.detalle, seña: p.seña, total: p.total, etiqueta: p.etiqueta, link_carpeta: p.link_carpeta || "" }; this.abrirModalPedido = true; },
+          
           async guardarPedido() {
             let payload = { cliente_id: this.nuevo.cliente_id || null, detalle: this.nuevo.detalle, seña: Number(this.nuevo.seña) || 0, total: Number(this.nuevo.total) || 0, etiqueta: this.nuevo.etiqueta || 'General', link_carpeta: this.nuevo.link_carpeta.trim() || null };
             if (this.modoEdicionPedido) {
@@ -320,7 +337,8 @@
             if (this.modoEdicionCliente) {
               await supabaseClient.from("clientes").update(this.nuevoCliente).eq("id", this.clienteIdEditando);
             } else {
-              await supabaseClient.from("clientes").insert([this.nuevoCliente]);
+              let { data } = await supabaseClient.from("clientes").insert([this.nuevoCliente]).select();
+              if (data) this.nuevo.cliente_id = data[0].id;
             }
             this.abrirModalCliente = false;
             await this.cargarClientes();
@@ -329,6 +347,7 @@
 
           async guardarGasto() {
             await supabaseClient.from("gastos").insert([{ concepto: this.nuevoGasto.concepto, monto: Number(this.nuevoGasto.monto) || 0, categoria: this.nuevoGasto.categoria }]);
+            this.nuevoGasto = { concepto: "", monto: 0, categoria: "DTF Tercerizado" };
             this.abrirModalGasto = false;
             await this.cargarGastos();
           },
@@ -418,9 +437,10 @@
       <!-- ================= SECCIÓN 0: CUSTOMIZADOR PÚBLICO ================= -->
       <div x-show="seccionActiva === 'customizador'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        <!-- Columna Izquierda: Visualizador Real con Mockup Dinámico (Remeras / Buzos o Tote Bags) -->
+        <!-- Columna Izquierda: Visualizador Real con Mockup Fotorrealista SVG Integrado -->
         <div class="bg-gradient-to-b from-[#1E382E] to-[#122A21] border border-emerald-900/50 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center relative min-h-[440px]">
           
+          <!-- Selector de Vista (Frente / Dorso) en la parte superior -->
           <div class="absolute top-4 left-4 right-4 flex justify-between items-center px-2 z-30">
             <span class="text-[10px] uppercase font-bold tracking-wider bg-crisDark text-crisGold px-3 py-1 rounded-xl border border-emerald-800 shadow-md" x-text="tipoPrenda + ' (' + colorPrenda + ')'"></span>
             
@@ -430,142 +450,276 @@
             </div>
           </div>
           
+          <!-- Contenedor del Mockup con SVG Fotorrealista Optimizado -->
           <div class="w-72 h-84 relative flex items-center justify-center mt-12 shadow-2xl rounded-2xl overflow-hidden border border-emerald-700/30 bg-[#162D24]">
             
-            <!-- MOCKUP REMERAS / BUZOS -->
-            <svg x-show="tipoPrenda !== 'Bolsas Tote Bags'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 650" class="w-full h-full absolute inset-0 z-10 pointer-events-none drop-shadow-2xl">
+            <!-- SVG Vectorial adaptable con tus definiciones exactas -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 650" class="w-full h-full absolute inset-0 z-10 pointer-events-none drop-shadow-2xl">
               <defs>
-                <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.35"/></filter>
-                <linearGradient id="lighting" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fff" stop-opacity="0.2"/><stop offset="100%" stop-color="#000" stop-opacity="0.45"/></linearGradient>
+                <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+                  <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.35"/>
+                </filter>
+                <linearGradient id="lighting" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ffffff" stop-opacity="0.2"/>
+                  <stop offset="50%" stop-color="#000000" stop-opacity="0.05"/>
+                  <stop offset="100%" stop-color="#000000" stop-opacity="0.45"/>
+                </linearGradient>
               </defs>
+
               <g filter="url(#shadow)">
-                <path d="M 180 50 Q 250 80 300 80 Q 350 80 420 50 L 480 90 L 540 180 Q 490 200 470 240 L 470 580 Q 470 600 450 600 L 150 600 Q 130 600 130 580 L 130 240 Q 110 200 60 180 L 120 90 Z" :fill="colorHex" stroke="rgba(255,255,255,0.2)" stroke-width="3" stroke-linejoin="round"/>
-                <path d="M 180 50 Q 250 80 300 80 Q 350 80 420 50 L 480 90 L 540 180 Q 490 200 470 240 L 470 580 Q 470 600 450 600 L 150 600 Q 130 600 130 580 L 130 240 Q 110 200 60 180 L 120 90 Z" fill="url(#lighting)" style="mix-blend-mode: overlay;"/>
-                <path x-show="vistaPrevisualizacion === 'frente'" d="M 180 50 Q 250 140 300 140 Q 350 140 420 50" fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="3.5"/>
-                <path x-show="vistaPrevisualizacion === 'dorso'" d="M 180 50 Q 250 90 300 90 Q 350 90 420 50" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="3"/>
+                <!-- Silueta base de la remera / prenda -->
+                <path d="M 180 50 
+                         Q 250 80 300 80 
+                         Q 350 80 420 50 
+                         L 480 90 
+                         L 540 180 
+                         Q 490 200 470 240 
+                         L 470 580 
+                         Q 470 600 450 600 
+                         L 150 600 
+                         Q 130 600 130 580 
+                         L 130 240 
+                         Q 110 200 60 180 
+                         L 120 90 
+                         Z" 
+                      :fill="colorHex" 
+                      stroke="rgba(255,255,255,0.2)" 
+                      stroke-width="3" 
+                      stroke-linejoin="round" />
+
+                <!-- Capa de volumen e iluminación -->
+                <path d="M 180 50 
+                         Q 250 80 300 80 
+                         Q 350 80 420 50 
+                         L 480 90 
+                         L 540 180 
+                         Q 490 200 470 240 
+                         L 470 580 
+                         Q 470 600 450 600 
+                         L 150 600 
+                         Q 130 600 130 580 
+                         L 130 240 
+                         Q 110 200 60 180 
+                         L 120 90 
+                         Z" 
+                      fill="url(#lighting)" 
+                      style="mix-blend-mode: overlay;" />
+
+                <!-- Cuello FRENTE -->
+                <path x-show="vistaPrevisualizacion === 'frente'" 
+                      d="M 180 50 
+                         Q 250 140 300 140 
+                         Q 350 140 420 50" 
+                      fill="none" 
+                      stroke="rgba(0,0,0,0.4)" 
+                      stroke-width="3.5" />
+                
+                <path x-show="vistaPrevisualizacion === 'frente'" 
+                      d="M 180 50 
+                         Q 250 130 300 130 
+                         Q 350 130 420 50
+                         Q 350 145 300 145
+                         Q 250 145 180 50 Z" 
+                      fill="rgba(0,0,0,0.2)" 
+                      stroke="rgba(255,255,255,0.15)" 
+                      stroke-width="1.5" />
+
+                <!-- Cuello DORSO -->
+                <path x-show="vistaPrevisualizacion === 'dorso'" 
+                      d="M 180 50 
+                         Q 250 90 300 90 
+                         Q 350 90 420 50" 
+                      fill="none" 
+                      stroke="rgba(0,0,0,0.3)" 
+                      stroke-width="3" />
+                
+                <path x-show="vistaPrevisualizacion === 'dorso'" 
+                      d="M 180 50 
+                         Q 250 80 300 80 
+                         Q 350 80 420 50
+                         Q 350 95 300 95
+                         Q 250 95 180 50 Z" 
+                      fill="rgba(0,0,0,0.15)" 
+                      stroke="rgba(255,255,255,0.15)" 
+                      stroke-width="1.5" />
+
+                <!-- Costuras de los hombros -->
                 <path d="M 180 50 L 120 90" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="6,4"/>
                 <path d="M 420 50 L 480 90" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="6,4"/>
               </g>
             </svg>
 
-            <!-- MOCKUP TOTE BAGS EXCLUSIVO -->
-            <svg x-show="tipoPrenda === 'Bolsas Tote Bags'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 650" class="w-full h-full absolute inset-0 z-10 pointer-events-none drop-shadow-2xl">
-              <g filter="url(#shadow)">
-                <path d="M 220 180 Q 220 70 300 70 Q 380 70 380 180" fill="none" :stroke="colorHex" stroke-width="22" stroke-linecap="round"/>
-                <path d="M 235 180 Q 235 90 300 90 Q 365 90 365 180" fill="none" stroke="#162D24" stroke-width="12" stroke-linecap="round"/>
-                <rect x="140" y="180" width="320" height="380" rx="12" :fill="colorHex" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
-                <rect x="140" y="180" width="320" height="380" rx="12" fill="url(#lighting)" style="mix-blend-mode: overlay;"/>
-              </g>
-            </svg>
-
-            <!-- VISTA FRENTE -->
+            <!-- VISTA FRENTE (Estampa del usuario alineada al área vectorial) -->
             <div x-show="vistaPrevisualizacion === 'frente'" class="absolute w-36 h-40 flex items-center justify-center overflow-hidden z-20" style="top: 36%;">
-              <template x-if="!imagenFrente"><span class="text-[10px] font-bold text-center px-3 py-1.5 text-neutral-200 bg-black/60 backdrop-blur-sm rounded-xl border border-white/20 shadow-xl">Sin estampa (Frente)</span></template>
-              <template x-if="imagenFrente"><img :src="imagenFrente" alt="Diseño Frente" class="object-contain transition-all duration-75 drop-shadow-2xl" :style="'width: ' + ((anchoFrenteCm / 32) * 100) + '%; transform: translate(' + posicionXFrente + 'px, ' + posicionYFrente + 'px);'" /></template>
+              <template x-if="!imagenFrente">
+                <span class="text-[10px] font-bold text-center px-3 py-1.5 text-neutral-200 bg-black/60 backdrop-blur-sm rounded-xl border border-white/20 shadow-xl">Sin estampa (Frente)</span>
+              </template>
+              <template x-if="imagenFrente">
+                <img :src="imagenFrente" alt="Diseño Frente" class="object-contain transition-all duration-75 drop-shadow-2xl" :style="'width: ' + ((anchoFrenteCm / 32) * 100) + '%; transform: translate(' + posicionXFrente + 'px, ' + posicionYFrente + 'px);'" />
+              </template>
             </div>
 
-            <!-- VISTA DORSO -->
+            <!-- VISTA DORSO (Estampa del usuario alineada al área vectorial) -->
             <div x-show="vistaPrevisualizacion === 'dorso'" class="absolute w-36 h-40 flex items-center justify-center overflow-hidden z-20" style="top: 36%;">
-              <template x-if="!imagenDorso"><span class="text-[10px] font-bold text-center px-3 py-1.5 text-neutral-200 bg-black/60 backdrop-blur-sm rounded-xl border border-white/20 shadow-xl">Sin estampa (Dorso)</span></template>
-              <template x-if="imagenDorso"><img :src="imagenDorso" alt="Diseño Dorso" class="object-contain transition-all duration-75 drop-shadow-2xl" :style="'width: ' + ((anchoDorsoCm / 32) * 100) + '%; transform: translate(' + posicionXDorso + 'px, ' + posicionYDorso + 'px);'" /></template>
+              <template x-if="!imagenDorso">
+                <span class="text-[10px] font-bold text-center px-3 py-1.5 text-neutral-200 bg-black/60 backdrop-blur-sm rounded-xl border border-white/20 shadow-xl">Sin estampa (Dorso)</span>
+              </template>
+              <template x-if="imagenDorso">
+                <img :src="imagenDorso" alt="Diseño Dorso" class="object-contain transition-all duration-75 drop-shadow-2xl" :style="'width: ' + ((anchoDorsoCm / 32) * 100) + '%; transform: translate(' + posicionXDorso + 'px, ' + posicionYDorso + 'px);'" />
+              </template>
             </div>
             
           </div>
           <span class="text-[10px] mt-3 font-semibold uppercase tracking-widest text-emerald-300/80" x-text="'Vista: ' + vistaPrevisualizacion.toUpperCase()"></span>
+          <p class="text-[11px] text-emerald-300/60 mt-1 text-center">Mockup vectorial interactivo optimizado para tu app.</p>
         </div>
 
         <!-- Columna Derecha: Controles del Customizador -->
         <div class="bg-crisCard border border-emerald-900/40 rounded-3xl p-6 shadow-2xl space-y-4 text-xs">
           <h2 class="text-base font-black text-white border-b border-emerald-900/40 pb-2">Armá tu Indumentaria</h2>
 
+          <!-- 1. Tipo de Prenda -->
           <div>
             <label class="block text-emerald-300/80 mb-1 font-semibold">1. Elegí la prenda o producto</label>
-            <select x-model="tipoPrenda" @change="actualizarTipoPrenda()" class="w-full bg-crisDark border border-emerald-800 rounded-xl px-3 py-2 text-white">
+            <select x-model="tipoPrenda" @change="actualizarTipoPrenda()" class="w-full bg-crisDark border border-emerald-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-crisGold">
               <option value="Remeras Adulto">Remeras Adulto (S al XXL)</option>
               <option value="Remeras Niños">Remeras Niños (Talles 4 al 16)</option>
               <option value="Musculosas">Musculosas (S al XXL)</option>
               <option value="Buzo Cuello Redondo">Buzo Cuello Redondo (S al XXL)</option>
               <option value="Buzo Canguro">Buzo Canguro (S al XXL)</option>
-              <option value="Bolsas Tote Bags">Bolsas Tote Bags (Tote Bag)</option>
+              <option value="Bolsas Tote Bags">Bolsas Tote Bags (Fuera de indumentaria)</option>
             </select>
           </div>
 
+          <!-- 2. Colores Restringidos por Catálogo Real -->
           <div>
             <label class="block text-emerald-300/80 mb-1.5 font-semibold">2. Color disponible en catálogo</label>
             <div class="flex flex-wrap gap-2 max-h-28 overflow-y-auto p-1 bg-crisDark/40 rounded-xl border border-emerald-900/50">
               <template x-for="c in coloresPorPrenda()">
-                <button type="button" @click="seleccionarColor(c)" class="w-8 h-8 rounded-full border-2 transition shadow-md" :class="colorPrenda === c.nombre ? 'border-crisGold scale-110' : 'border-black/30'" :style="'background-color: ' + c.hex" :title="c.nombre"></button>
+                <button type="button" @click="seleccionarColor(c)" 
+                  class="w-8 h-8 rounded-full border-2 transition shadow-md flex items-center justify-center relative group"
+                  :class="colorPrenda === c.nombre ? 'border-crisGold scale-110 ring-2 ring-crisGold/50' : 'border-black/30 opacity-90'"
+                  :style="'background-color: ' + c.hex" :title="c.nombre">
+                </button>
               </template>
             </div>
             <p class="text-[11px] text-crisGold mt-1 font-medium" x-text="'Color seleccionado: ' + colorPrenda"></p>
           </div>
 
+          <!-- 3. Talle -->
           <div>
             <label class="block text-emerald-300/80 mb-1 font-semibold">3. Talle</label>
             <div class="flex flex-wrap gap-2">
               <template x-for="t in tallesDisponibles()">
-                <button type="button" @click="talleSeleccionado = t" :class="talleSeleccionado === t ? 'bg-crisGold text-crisDark font-bold' : 'bg-crisDark text-emerald-200 border border-emerald-800'" class="px-3 h-9 rounded-xl text-xs transition" x-text="t"></button>
+                <button type="button" @click="talleSeleccionado = t"
+                  :class="talleSeleccionado === t ? 'bg-crisGold text-crisDark font-bold' : 'bg-crisDark text-emerald-200 border border-emerald-800'"
+                  class="px-3 h-9 rounded-xl text-xs transition" x-text="t">
+                </button>
               </template>
             </div>
           </div>
 
+          <!-- 4. Subir y Configurar Diseños (Frente y Dorso en cm) -->
           <div class="space-y-3 p-3 bg-crisDark/50 border border-emerald-900/60 rounded-2xl">
             <label class="block text-emerald-300/90 font-bold text-sm">4. Diseños y Medidas (en cm)</label>
-            <div>
+            
+            <!-- Configuración Frente -->
+            <div class="border-b border-emerald-900/60 pb-3">
               <span class="text-crisGold font-bold block mb-1">Frente de la prenda</span>
               <input type="file" accept="image/*" @change="cargarImagenFrente" class="w-full bg-crisDark border border-emerald-800 rounded-xl px-2 py-1.5 text-emerald-200 text-[11px] file:mr-2 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-bold file:bg-crisGold file:text-crisDark cursor-pointer mb-2" />
               <template x-if="imagenFrente">
-                <div class="grid grid-cols-2 gap-2 mt-1">
-                  <div><span>Ancho: <strong x-text="anchoFrenteCm + 'cm'"></strong></span><input type="range" min="8" max="32" x-model.number="anchoFrenteCm" class="w-full accent-crisGold"/></div>
-                  <div><span>Altura Y: <strong x-text="posicionYFrente + 'px'"></strong></span><input type="range" min="-30" max="30" x-model.number="posicionYFrente" class="w-full accent-crisGold"/></div>
+                <div class="space-y-2 mt-1">
+                  <div>
+                    <div class="flex justify-between text-[10px] text-emerald-300/70 mb-0.5">
+                      <span>Ancho de estampa:</span>
+                      <strong class="text-white" x-text="anchoFrenteCm + ' cm'"></strong>
+                    </div>
+                    <input type="range" min="8" max="32" x-model.number="anchoFrenteCm" class="w-full accent-crisGold cursor-pointer" />
+                    <div class="flex justify-between text-[9px] text-emerald-300/50">
+                      <span>8 cm (Logo pecho)</span>
+                      <span>32 cm (Grande)</span>
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2 pt-1">
+                    <div>
+                      <span class="text-[10px] text-emerald-300/70">Mover X: <strong x-text="posicionXFrente + 'px'"></strong></span>
+                      <input type="range" min="-30" max="30" x-model.number="posicionXFrente" class="w-full accent-crisGold cursor-pointer" />
+                    </div>
+                    <div>
+                      <span class="text-[10px] text-emerald-300/70">Mover Y: <strong x-text="posicionYFrente + 'px'"></strong></span>
+                      <input type="range" min="-30" max="30" x-model.number="posicionYFrente" class="w-full accent-crisGold cursor-pointer" />
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </div>
+
+            <!-- Configuración Dorso -->
+            <div>
+              <span class="text-crisGold font-bold block mb-1">Dorso / Espalda</span>
+              <input type="file" accept="image/*" @change="cargarImagenDorso" class="w-full bg-crisDark border border-emerald-800 rounded-xl px-2 py-1.5 text-emerald-200 text-[11px] file:mr-2 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-bold file:bg-crisGold file:text-crisDark cursor-pointer mb-2" />
+              <template x-if="imagenDorso">
+                <div class="space-y-2 mt-1">
+                  <div>
+                    <div class="flex justify-between text-[10px] text-emerald-300/70 mb-0.5">
+                      <span>Ancho de estampa:</span>
+                      <strong class="text-white" x-text="anchoDorsoCm + ' cm'"></strong>
+                    </div>
+                    <input type="range" min="8" max="32" x-model.number="anchoDorsoCm" class="w-full accent-crisGold cursor-pointer" />
+                    <div class="flex justify-between text-[9px] text-emerald-300/50">
+                      <span>8 cm (Logo espalda)</span>
+                      <span>32 cm (Grande)</span>
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2 pt-1">
+                    <div>
+                      <span class="text-[10px] text-emerald-300/70">Mover X: <strong x-text="posicionXDorso + 'px'"></strong></span>
+                      <input type="range" min="-30" max="30" x-model.number="posicionXDorso" class="w-full accent-crisGold cursor-pointer" />
+                    </div>
+                    <div>
+                      <span class="text-[10px] text-emerald-300/70">Mover Y: <strong x-text="posicionYDorso + 'px'"></strong></span>
+                      <input type="range" min="-30" max="30" x-model.number="posicionYDorso" class="w-full accent-crisGold cursor-pointer" />
+                    </div>
+                  </div>
                 </div>
               </template>
             </div>
           </div>
 
-          <button @click="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-bold text-sm shadow-lg flex items-center justify-center gap-2">
-            <span>Enviar Diseño por WhatsApp</span>
-          </button>
+          <!-- 5. Observaciones -->
+          <div>
+            <label class="block text-emerald-300/80 mb-1 font-semibold">5. Observaciones / Dudas</label>
+            <textarea x-model="observacionesDiseño" rows="2" placeholder="Ej: Ubicación exacta de las estampas..." class="w-full bg-crisDark border border-emerald-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-crisGold"></textarea>
+          </div>
+
+          <!-- Botón Enviar a WhatsApp -->
+          <div class="pt-2">
+            <button @click="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-bold text-sm transition shadow-lg flex items-center justify-center gap-2">
+              <span>Enviar Diseño por WhatsApp</span>
+            </button>
+          </div>
+
         </div>
       </div>
 
-      <!-- ================= SECCIÓN 1: CALCULADORA (Con Packaging Libre, Cantidades y Separación Costo/Ganancia) ================= -->
+      <!-- ================= SECCIÓN 1: CALCULADORA (Packaging Desbloqueado) ================= -->
       <div x-show="seccionActiva === 'calculadora'" style="display: none;" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <template x-for="(prod, index) in productos" :key="prod.id">
-          <div class="bg-crisCard border border-emerald-900/40 rounded-3xl p-6 shadow-2xl space-y-3">
-            <h2 class="text-lg font-bold text-white mb-2 border-b border-emerald-900/40 pb-2" x-text="prod.nombre"></h2>
-            
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <div><span class="text-emerald-200/70">Costo Prenda ($):</span><input type="number" x-model.number="prod.costoPrenda" class="w-full bg-crisDark border border-emerald-800/60 rounded-xl p-1.5 text-right text-white font-medium" /></div>
-              <div><span class="text-emerald-200/70">Costo DTF ($):</span><input type="number" x-model.number="prod.costoDtf" class="w-full bg-crisDark border border-emerald-800/60 rounded-xl p-1.5 text-right text-white font-medium" /></div>
-              <div><span class="text-emerald-200/70">Packaging ($): [Libre]</span><input type="number" x-model.number="prod.costoPackaging" class="w-full bg-crisDark border border-emerald-800/60 rounded-xl p-1.5 text-right text-white font-medium" /></div>
-              <div><span class="text-emerald-200/70">Multiplicador:</span><input type="number" step="0.1" x-model.number="prod.multiplicador" class="w-full bg-crisDark border border-emerald-800/60 rounded-xl p-1.5 text-right text-white font-medium" /></div>
+          <div class="bg-crisCard border border-emerald-900/40 rounded-3xl p-6 shadow-2xl">
+            <h2 class="text-lg font-bold text-white mb-4 border-b border-emerald-900/40 pb-2" x-text="prod.nombre"></h2>
+            <div class="space-y-3 text-sm">
+              <div class="flex justify-between items-center"><span class="text-emerald-200/70">Costo Prenda ($):</span><input type="number" x-model.number="prod.costoPrenda" class="bg-crisDark border border-emerald-800/60 rounded-xl px-3 py-1.5 w-32 text-right text-white font-medium" /></div>
+              <div class="flex justify-between items-center"><span class="text-emerald-200/70">Costo DTF ($):</span><input type="number" x-model.number="prod.costoDtf" class="bg-crisDark border border-emerald-800/60 rounded-xl px-3 py-1.5 w-32 text-right text-white font-medium" /></div>
+              <!-- Cambio 3: Packaging desbloqueado (sin disabled y con estilo activo) -->
+              <div class="flex justify-between items-center"><span class="text-emerald-200/70">Packaging ($):</span><input type="number" x-model.number="prod.costoPackaging" class="bg-crisDark border border-emerald-800/60 rounded-xl px-3 py-1.5 w-32 text-right text-white font-medium" /></div>
+              <div class="flex justify-between items-center"><span class="text-emerald-200/70">Multiplicador:</span><input type="number" step="0.1" x-model.number="prod.multiplicador" class="bg-crisDark border border-emerald-800/60 rounded-xl px-3 py-1.5 w-32 text-right text-white font-medium" /></div>
             </div>
-
-            <!-- Selector de Cantidad de Unidades -->
-            <div class="p-2.5 bg-crisDark/60 rounded-xl border border-emerald-800/60 flex justify-between items-center text-xs">
-              <span class="text-emerald-300 font-bold">Cantidad de Unidades:</span>
-              <input type="number" min="1" x-model.number="prod.cantidad" class="w-20 bg-crisCard border border-emerald-700 rounded-lg p-1 text-center text-white font-black text-sm" />
-            </div>
-
-            <!-- Desglose Separado de Costo y Ganancia -->
-            <div class="mt-4 pt-3 border-t border-emerald-900/40 space-y-1.5 text-xs">
-              <div class="flex justify-between text-emerald-300/70">
-                <span>Costo Total (Tirada):</span>
-                <strong class="text-white" x-text="formatMoney(calcularCostoTotal(prod))"></strong>
-              </div>
-              <div class="flex justify-between text-crisGold font-bold">
-                <span>Ganancia Total Estimada:</span>
-                <strong x-text="formatMoney(calcularGananciaTotal(prod))"></strong>
-              </div>
-              <div class="flex justify-between items-center pt-2 border-t border-emerald-900/20">
-                <span class="text-[11px] uppercase text-emerald-300/50">Precio Final Total</span>
-                <span class="text-xl font-black text-crisGold" x-text="formatMoney(calcularPrecioTotal(prod))"></span>
-              </div>
+            <div class="mt-6 pt-4 border-t border-emerald-900/40 flex justify-between items-center">
+              <div><p class="text-[11px] uppercase text-emerald-300/60 font-semibold">Costo Total</p><p class="text-base font-semibold text-emerald-100" x-text="formatMoney(calcularTotal(prod))"></p></div>
+              <div class="text-right"><p class="text-[11px] uppercase text-crisGold font-bold">Precio Sugerido</p><p class="text-2xl font-black text-crisGold" x-text="formatMoney(calcularPrecio(prod))"></p></div>
             </div>
           </div>
         </template>
-
         <div class="col-span-full flex justify-end mt-2">
           <button @click="guardarCambios()" class="bg-emerald-800 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition shadow-lg">Guardar Precios y Packaging en la Nube</button>
         </div>
@@ -685,45 +839,6 @@
             <div class="grid grid-cols-2 gap-2"><div><label class="text-emerald-300">Seña ($)</label><input type="number" x-model="nuevo.seña" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div><div><label class="text-emerald-300">Total ($)</label><input type="number" x-model="nuevo.total" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div></div>
             <div><label class="text-emerald-300">Link Drive</label><input type="text" x-model="nuevo.link_carpeta" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
             <div class="flex justify-end gap-2 pt-2"><button type="button" @click="abrirModalPedido = false" class="bg-gray-800 text-gray-300 px-4 py-2 rounded-xl">Cancelar</button><button type="submit" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl font-bold">Guardar</button></div>
-          </form>
-        </div>
-      </div>
-
-      <!-- MODAL NUEVO CLIENTE -->
-      <div x-show="abrirModalCliente" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
-        <div class="bg-crisCard border border-emerald-900 rounded-3xl p-6 w-full max-w-md shadow-2xl" @click.away="abrirModalCliente = false">
-          <h3 class="text-lg font-bold text-white mb-4">Gestión de Cliente</h3>
-          <form @submit.prevent="guardarCliente()" class="space-y-3 text-xs">
-            <div><label class="text-emerald-300">Nombre</label><input type="text" x-model="nuevoCliente.nombre" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
-            <div><label class="text-emerald-300">Teléfono</label><input type="text" x-model="nuevoCliente.telefono" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
-            <div><label class="text-emerald-300">Localidad</label><input type="text" x-model="nuevoCliente.localidad" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
-            <div class="flex justify-end gap-2 pt-2"><button type="button" @click="abrirModalCliente = false" class="bg-gray-800 text-gray-300 px-4 py-2 rounded-xl">Cancelar</button><button type="submit" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl font-bold">Guardar</button></div>
-          </form>
-        </div>
-      </div>
-
-      <!-- MODAL NUEVO GASTO -->
-      <div x-show="abrirModalGasto" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
-        <div class="bg-crisCard border border-emerald-900 rounded-3xl p-6 w-full max-w-md shadow-2xl" @click.away="abrirModalGasto = false">
-          <h3 class="text-lg font-bold text-white mb-4">Registrar Gasto</h3>
-          <form @submit.prevent="guardarGasto()" class="space-y-3 text-xs">
-            <div><label class="text-emerald-300">Concepto</label><input type="text" x-model="nuevoGasto.concepto" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
-            <div><label class="text-emerald-300">Monto ($)</label><input type="number" x-model="nuevoGasto.monto" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
-            <div><label class="text-emerald-300">Categoría</label><select x-model="nuevoGasto.categoria" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white"><option value="DTF Tercerizado">DTF Tercerizado</option><option value="Insumos">Insumos</option><option value="Servicios / Varios">Servicios / Varios</option></select></div>
-            <div class="flex justify-end gap-2 pt-2"><button type="button" @click="abrirModalGasto = false" class="bg-gray-800 text-gray-300 px-4 py-2 rounded-xl">Cancelar</button><button type="submit" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl font-bold">Guardar</button></div>
-          </form>
-        </div>
-      </div>
-
-      <!-- MODAL NUEVO STOCK -->
-      <div x-show="abrirModalStock" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
-        <div class="bg-crisCard border border-emerald-900 rounded-3xl p-6 w-full max-w-md shadow-2xl" @click.away="abrirModalStock = false">
-          <h3 class="text-lg font-bold text-white mb-4">Gestión de Stock</h3>
-          <form @submit.prevent="guardarStockItem()" class="space-y-3 text-xs">
-            <div><label class="text-emerald-300">Item</label><input type="text" x-model="nuevoItemStock.item" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
-            <div><label class="text-emerald-300">Categoría</label><input type="text" x-model="nuevoItemStock.categoria" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
-            <div class="grid grid-cols-2 gap-2"><div><label class="text-emerald-300">Stock Actual</label><input type="number" x-model="nuevoItemStock.stock_actual" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div><div><label class="text-emerald-300">Mínimo</label><input type="number" x-model="nuevoItemStock.stock_minimo" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div></div>
-            <div class="flex justify-end gap-2 pt-2"><button type="button" @click="abrirModalStock = false" class="bg-gray-800 text-gray-300 px-4 py-2 rounded-xl">Cancelar</button><button type="submit" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl font-bold">Guardar</button></div>
           </form>
         </div>
       </div>
