@@ -450,24 +450,24 @@
             </div>
           </div>
           
-          <!-- Contenedor del Mockup con SVG Fotorrealista Optimizado según mockup_2.jpg -->
-          <div class="w-72 h-84 relative flex items-center justify-center mt-12 shadow-2xl rounded-2xl overflow-hidden border border-emerald-700/30 bg-[#162D24]">
+          <!-- Contenedor del Mockup con Fondo Contrastante (#0d1b14) para que la remera negra resalte perfecto -->
+          <div class="w-72 h-84 relative flex items-center justify-center mt-12 shadow-2xl rounded-2xl overflow-hidden border border-emerald-700/40 bg-[#0d1b14]">
             
             <!-- SVG Vectorial fotorrealista adaptado a la silueta de remera real -->
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 650" class="w-full h-full absolute inset-0 z-10 pointer-events-none drop-shadow-2xl">
               <defs>
                 <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-                  <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.35"/>
+                  <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.5"/>
                 </filter>
                 <linearGradient id="lighting" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/>
-                  <stop offset="50%" stop-color="#000000" stop-opacity="0.04"/>
-                  <stop offset="100%" stop-color="#000000" stop-opacity="0.45"/>
+                  <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/>
+                  <stop offset="50%" stop-color="#000000" stop-opacity="0.05"/>
+                  <stop offset="100%" stop-color="#000000" stop-opacity="0.55"/>
                 </linearGradient>
               </defs>
 
               <g filter="url(#shadow)">
-                <!-- Silueta base de la remera optimizada con caída de hombros y mangas estilo mockup_2.jpg -->
+                <!-- Silueta base de la remera con borde claro para destacar prendas oscuras/negras -->
                 <path d="M 175 45 
                          Q 250 72 300 72 
                          Q 350 72 425 45 
@@ -483,8 +483,8 @@
                          L 115 85 
                          Z" 
                       :fill="colorHex" 
-                      stroke="rgba(255,255,255,0.2)" 
-                      stroke-width="3" 
+                      stroke="rgba(255,255,255,0.35)" 
+                      stroke-width="3.5" 
                       stroke-linejoin="round" />
 
                 <!-- Capa de volumen e iluminación realista -->
@@ -511,7 +511,7 @@
                          Q 250 135 300 135 
                          Q 350 135 425 45" 
                       fill="none" 
-                      stroke="rgba(0,0,0,0.45)" 
+                      stroke="rgba(255,255,255,0.4)" 
                       stroke-width="3.5" />
                 
                 <path x-show="vistaPrevisualizacion === 'frente'" 
@@ -520,8 +520,8 @@
                          Q 350 122 425 45
                          Q 350 140 300 140
                          Q 250 140 175 45 Z" 
-                      fill="rgba(0,0,0,0.22)" 
-                      stroke="rgba(255,255,255,0.18)" 
+                      fill="rgba(0,0,0,0.3)" 
+                      stroke="rgba(255,255,255,0.25)" 
                       stroke-width="1.5" />
 
                 <!-- Cuello DORSO -->
@@ -530,7 +530,7 @@
                          Q 250 85 300 85 
                          Q 350 85 425 45" 
                       fill="none" 
-                      stroke="rgba(0,0,0,0.35)" 
+                      stroke="rgba(255,255,255,0.35)" 
                       stroke-width="3" />
                 
                 <path x-show="vistaPrevisualizacion === 'dorso'" 
@@ -539,20 +539,20 @@
                          Q 350 75 425 45
                          Q 350 92 300 92
                          Q 250 92 175 45 Z" 
-                      fill="rgba(0,0,0,0.18)" 
-                      stroke="rgba(255,255,255,0.18)" 
+                      fill="rgba(0,0,0,0.25)" 
+                      stroke="rgba(255,255,255,0.25)" 
                       stroke-width="1.5" />
 
                 <!-- Costuras de los hombros y mangas -->
-                <path d="M 175 45 L 115 85" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="2" stroke-dasharray="6,4"/>
-                <path d="M 425 45 L 485 85" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="2" stroke-dasharray="6,4"/>
+                <path d="M 175 45 L 115 85" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="6,4"/>
+                <path d="M 425 45 L 485 85" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="6,4"/>
               </g>
             </svg>
 
             <!-- VISTA FRENTE (Estampa alineada con precisión al área vectorial) -->
             <div x-show="vistaPrevisualizacion === 'frente'" class="absolute w-36 h-40 flex items-center justify-center overflow-hidden z-20" style="top: 36%;">
               <template x-if="!imagenFrente">
-                <span class="text-[10px] font-bold text-center px-3 py-1.5 text-neutral-200 bg-black/60 backdrop-blur-sm rounded-xl border border-white/20 shadow-xl">Sin estampa (Frente)</span>
+                <span class="text-[10px] font-bold text-center px-3 py-1.5 text-neutral-200 bg-black/70 backdrop-blur-sm rounded-xl border border-white/20 shadow-xl">Sin estampa (Frente)</span>
               </template>
               <template x-if="imagenFrente">
                 <img :src="imagenFrente" alt="Diseño Frente" class="object-contain transition-all duration-75 drop-shadow-2xl" :style="'width: ' + ((anchoFrenteCm / 32) * 100) + '%; transform: translate(' + posicionXFrente + 'px, ' + posicionYFrente + 'px);'" />
@@ -562,7 +562,7 @@
             <!-- VISTA DORSO (Estampa alineada con precisión al área vectorial) -->
             <div x-show="vistaPrevisualizacion === 'dorso'" class="absolute w-36 h-40 flex items-center justify-center overflow-hidden z-20" style="top: 36%;">
               <template x-if="!imagenDorso">
-                <span class="text-[10px] font-bold text-center px-3 py-1.5 text-neutral-200 bg-black/60 backdrop-blur-sm rounded-xl border border-white/20 shadow-xl">Sin estampa (Dorso)</span>
+                <span class="text-[10px] font-bold text-center px-3 py-1.5 text-neutral-200 bg-black/70 backdrop-blur-sm rounded-xl border border-white/20 shadow-xl">Sin estampa (Dorso)</span>
               </template>
               <template x-if="imagenDorso">
                 <img :src="imagenDorso" alt="Diseño Dorso" class="object-contain transition-all duration-75 drop-shadow-2xl" :style="'width: ' + ((anchoDorsoCm / 32) * 100) + '%; transform: translate(' + posicionXDorso + 'px, ' + posicionYDorso + 'px);'" />
