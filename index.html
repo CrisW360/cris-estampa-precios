@@ -257,6 +257,7 @@
                 costoDtf: p.costo_dtf,
                 costoPackaging: p.costo_packaging,
                 multiplicador: p.multiplicador,
+                cantidad: 1 // Cambio 4: Cantidad inicial de unidades
               }));
             } catch (e) { console.error(e); }
           },
@@ -293,8 +294,13 @@
             } catch (e) { console.error(e); }
           },
 
-          calcularTotal(p) { return (p.costoPrenda || 0) + (p.costoDtf || 0) + (p.costoPackaging || 0); },
-          calcularPrecio(p) { return this.calcularTotal(p) * (p.multiplicador || 2.0); },
+          // Funciones de cálculo unitario y total (Cambios 4 y 5)
+          calcularCostoUnitario(p) { return (Number(p.costoPrenda) || 0) + (Number(p.costoDtf) || 0) + (Number(p.costoPackaging) || 0); },
+          calcularPrecioUnitario(p) { return this.calcularCostoUnitario(p) * (Number(p.multiplicador) || 2.0); },
+          calcularCostoTotal(p) { return this.calcularCostoUnitario(p) * (Number(p.cantidad) || 1); },
+          calcularPrecioTotal(p) { return this.calcularPrecioUnitario(p) * (Number(p.cantidad) || 1); },
+          calcularGananciaTotal(p) { return this.calcularPrecioTotal(p) - this.calcularCostoTotal(p); },
+
           formatMoney(val) { return "$ " + Math.round(val || 0).toLocaleString("es-AR"); },
 
           get totalVentas() { return this.pedidos.reduce((acc, p) => acc + Number(p.total || 0), 0); },
@@ -702,21 +708,39 @@
         </div>
       </div>
 
-      <!-- ================= SECCIÓN 1: CALCULADORA (Packaging Desbloqueado) ================= -->
+      <!-- ================= SECCIÓN 1: CALCULADORA (Con Cambios 3, 4 y 5) ================= -->
       <div x-show="seccionActiva === 'calculadora'" style="display: none;" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <template x-for="(prod, index) in productos" :key="prod.id">
-          <div class="bg-crisCard border border-emerald-900/40 rounded-3xl p-6 shadow-2xl">
-            <h2 class="text-lg font-bold text-white mb-4 border-b border-emerald-900/40 pb-2" x-text="prod.nombre"></h2>
-            <div class="space-y-3 text-sm">
-              <div class="flex justify-between items-center"><span class="text-emerald-200/70">Costo Prenda ($):</span><input type="number" x-model.number="prod.costoPrenda" class="bg-crisDark border border-emerald-800/60 rounded-xl px-3 py-1.5 w-32 text-right text-white font-medium" /></div>
-              <div class="flex justify-between items-center"><span class="text-emerald-200/70">Costo DTF ($):</span><input type="number" x-model.number="prod.costoDtf" class="bg-crisDark border border-emerald-800/60 rounded-xl px-3 py-1.5 w-32 text-right text-white font-medium" /></div>
-              <!-- Cambio 3: Packaging desbloqueado (sin disabled y con estilo activo) -->
-              <div class="flex justify-between items-center"><span class="text-emerald-200/70">Packaging ($):</span><input type="number" x-model.number="prod.costoPackaging" class="bg-crisDark border border-emerald-800/60 rounded-xl px-3 py-1.5 w-32 text-right text-white font-medium" /></div>
-              <div class="flex justify-between items-center"><span class="text-emerald-200/70">Multiplicador:</span><input type="number" step="0.1" x-model.number="prod.multiplicador" class="bg-crisDark border border-emerald-800/60 rounded-xl px-3 py-1.5 w-32 text-right text-white font-medium" /></div>
+          <div class="bg-crisCard border border-emerald-900/40 rounded-3xl p-6 shadow-2xl space-y-3">
+            <h2 class="text-lg font-bold text-white mb-2 border-b border-emerald-900/40 pb-2" x-text="prod.nombre"></h2>
+            
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div><span class="text-emerald-200/70">Costo Prenda ($):</span><input type="number" x-model.number="prod.costoPrenda" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-1.5 text-right text-white font-medium" /></div>
+              <div><span class="text-emerald-200/70">Costo DTF ($):</span><input type="number" x-model.number="prod.costoDtf" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-1.5 text-right text-white font-medium" /></div>
+              <div><span class="text-emerald-200/70">Packaging ($) [Libre]:</span><input type="number" x-model.number="prod.costoPackaging" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-1.5 text-right text-white font-medium" /></div>
+              <div><span class="text-emerald-200/70">Multiplicador:</span><input type="number" step="0.1" x-model.number="prod.multiplicador" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-1.5 text-right text-white font-medium" /></div>
             </div>
-            <div class="mt-6 pt-4 border-t border-emerald-900/40 flex justify-between items-center">
-              <div><p class="text-[11px] uppercase text-emerald-300/60 font-semibold">Costo Total</p><p class="text-base font-semibold text-emerald-100" x-text="formatMoney(calcularTotal(prod))"></p></div>
-              <div class="text-right"><p class="text-[11px] uppercase text-crisGold font-bold">Precio Sugerido</p><p class="text-2xl font-black text-crisGold" x-text="formatMoney(calcularPrecio(prod))"></p></div>
+
+            <!-- Cambio 4: Selector de Cantidad de Unidades -->
+            <div class="p-2.5 bg-crisDark/60 rounded-xl border border-emerald-800/60 flex justify-between items-center text-xs mt-2">
+              <span class="text-emerald-300 font-bold">Cantidad de Unidades:</span>
+              <input type="number" min="1" x-model.number="prod.cantidad" class="w-20 bg-crisCard border border-emerald-700 rounded-lg p-1 text-center text-white font-black text-sm" />
+            </div>
+
+            <!-- Cambio 5: Desglose separado entre Costo Total y Ganancia Total Estimada -->
+            <div class="mt-4 pt-3 border-t border-emerald-900/40 space-y-1.5 text-xs">
+              <div class="flex justify-between text-emerald-300/70">
+                <span>Costo Total (Tirada):</span>
+                <strong class="text-white" x-text="formatMoney(calcularCostoTotal(prod))"></strong>
+              </div>
+              <div class="flex justify-between text-crisGold font-bold">
+                <span>Ganancia Total Estimada:</span>
+                <strong x-text="formatMoney(calcularGananciaTotal(prod))"></strong>
+              </div>
+              <div class="flex justify-between items-center pt-2 border-t border-emerald-900/20">
+                <span class="text-[11px] uppercase text-emerald-300/50">Precio Final Total</span>
+                <span class="text-xl font-black text-crisGold" x-text="formatMoney(calcularPrecioTotal(prod))"></span>
+              </div>
             </div>
           </div>
         </template>
