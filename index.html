@@ -48,7 +48,7 @@
           // Estados del Customizador Público
           tipoPrenda: 'Remeras Adulto',
           colorPrenda: 'Negro',
-          colorHex: '#111827',
+          colorHex: '#111111',
           talleSeleccionado: 'L',
           
           vistaPrevisualizacion: 'frente', // 'frente' o 'dorso'
@@ -67,7 +67,7 @@
 
           observacionesDiseño: '',
 
-          // Paleta de colores filtrada para Remeras Adulto
+          // Paleta de colores filtrada para Remeras Adulto (Negro corregido a #111111)
           coloresPorPrenda() {
             switch(this.tipoPrenda) {
               case 'Remeras Adulto':
@@ -75,7 +75,7 @@
                   { nombre: 'Blanco', hex: '#ffffff' },
                   { nombre: 'Melange Medio', hex: '#9ca3af' },
                   { nombre: 'Melange Oscuro', hex: '#374151' },
-                  { nombre: 'Negro', hex: '#111827' },
+                  { nombre: 'Negro', hex: '#111111' },
                   { nombre: 'Azul Marino', hex: '#1e3a8a' },
                   { nombre: 'Azul Francia', hex: '#2563eb' },
                   { nombre: 'Azul Aero', hex: '#3b82f6' },
@@ -89,7 +89,7 @@
                 ];
               case 'Remeras Niños':
                 return [
-                  { nombre: 'Blanco', hex: '#ffffff' }, { nombre: 'Negro', hex: '#111827' },
+                  { nombre: 'Blanco', hex: '#ffffff' }, { nombre: 'Negro', hex: '#111111' },
                   { nombre: 'Melange Claro', hex: '#d1d5db' }, { nombre: 'Melange Oscuro', hex: '#374151' },
                   { nombre: 'Azul Marino', hex: '#1e3a8a' }, { nombre: 'Azul Francia', hex: '#2563eb' },
                   { nombre: 'Azul Aero', hex: '#3b82f6' }, { nombre: 'Lila', hex: '#c4b5fd' },
@@ -99,7 +99,7 @@
                 ];
               case 'Musculosas':
                 return [
-                  { nombre: 'Blanco', hex: '#ffffff' }, { nombre: 'Negro', hex: '#111827' },
+                  { nombre: 'Blanco', hex: '#ffffff' }, { nombre: 'Negro', hex: '#111111' },
                   { nombre: 'Rojo', hex: '#dc2626' }, { nombre: 'Melange Claro', hex: '#d1d5db' },
                   { nombre: 'Violeta', hex: '#7c3aed' }, { nombre: 'Chocolate', hex: '#78350f' },
                   { nombre: 'Verde Militar', hex: '#3f6212' }, { nombre: 'Verde Bosque', hex: '#065f46' },
@@ -109,13 +109,13 @@
                 ];
               case 'Buzo Cuello Redondo':
                 return [
-                  { nombre: 'Blanco', hex: '#ffffff' }, { nombre: 'Negro', hex: '#111827' },
+                  { nombre: 'Blanco', hex: '#ffffff' }, { nombre: 'Negro', hex: '#111111' },
                   { nombre: 'Melange Claro', hex: '#d1d5db' }, { nombre: 'Melange Medio', hex: '#9ca3af' },
                   { nombre: 'Melange Oscuro', hex: '#374151' }, { nombre: 'Azul Marino', hex: '#1e3a8a' }
                 ];
               case 'Buzo Canguro':
                 return [
-                  { nombre: 'Negro', hex: '#111827' }, { nombre: 'Melange Claro', hex: '#d1d5db' },
+                  { nombre: 'Negro', hex: '#111111' }, { nombre: 'Melange Claro', hex: '#d1d5db' },
                   { nombre: 'Melange Medio', hex: '#9ca3af' }, { nombre: 'Melange Oscuro', hex: '#374151' },
                   { nombre: 'Crema', hex: '#fef08a' }, { nombre: 'Azul Marino', hex: '#1e3a8a' },
                   { nombre: 'Verde Bosque', hex: '#065f46' }, { nombre: 'Verde Militar', hex: '#3f6212' },
@@ -123,10 +123,10 @@
                 ];
               case 'Bolsas Tote Bags':
                 return [
-                  { nombre: 'Natural / Crudo', hex: '#fdfbf7' }, { nombre: 'Negro', hex: '#111827' }
+                  { nombre: 'Natural / Crudo', hex: '#fdfbf7' }, { nombre: 'Negro', hex: '#111111' }
                 ];
               default:
-                return [{ nombre: 'Negro', hex: '#111827' }];
+                return [{ nombre: 'Negro', hex: '#111111' }];
             }
           },
 
@@ -168,26 +168,25 @@
           },
 
           enviarPedidoWhatsApp() {
-            let texto = `¡Hola Cris! 👋 Estuve armando este diseño en la web de Cris Estampa:\n\n`;
-            texto += `👕 *Prenda:* ${this.tipoPrenda} (${this.colorPrenda})\n`;
-            texto += `📏 *Talle:* ${this.talleSeleccionado}\n\n`;
+            let texto = `Hola Cris! Estuve armando este diseño en la web de Cris Estampa:\n\n`;
+            texto += `*Prenda:* ${this.tipoPrenda} (${this.colorPrenda})\n`;
+            texto += `*Talle:* ${this.talleSeleccionado}\n\n`;
             
             if (this.imagenFrente) {
-              texto += `🖼️ *FRENTE:* Estampa de ${this.anchoFrenteCm} cm de ancho (Pos X: ${this.posicionXFrente}px, Y: ${this.posicionYFrente}px)\n`;
+              texto += `*FRENTE:* Estampa de ${this.anchoFrenteCm} cm de ancho (Pos X: ${this.posicionXFrente}px, Y: ${this.posicionYFrente}px)\n`;
             }
             if (this.imagenDorso) {
-              texto += `🖼️ *DORSO:* Estampa de ${this.anchoDorsoCm} cm de ancho (Pos X: ${this.posicionXDorso}px, Y: ${this.posicionYDorso}px)\n`;
+              texto += `*DORSO:* Estampa de ${this.anchoDorsoCm} cm de ancho (Pos X: ${this.posicionXDorso}px, Y: ${this.posicionYDorso}px)\n`;
             }
             
             if (this.observacionesDiseño) {
-              texto += `\n📝 *Notas:* ${this.observacionesDiseño}\n`;
+              texto += `\n*Notas:* ${this.observacionesDiseño}\n`;
             }
             texto += `\nTe envío los detalles para coordinar el pedido. ¡Gracias!`;
             
-            // Reemplazá con tu número real de WhatsApp (Ej: 5493411234567)
             let tuNumero = "5493413457465"; 
             
-            let url = `https://wa.me/${tuNumero}?text=${encodeURIComponent(texto)}`;
+            let url = `https://wa.me/${tuNumero}?text=` + encodeURIComponent(texto);
             window.open(url, '_blank');
           },
 
@@ -438,54 +437,78 @@
       <!-- ================= SECCIÓN 0: CUSTOMIZADOR PÚBLICO ================= -->
       <div x-show="seccionActiva === 'customizador'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        <!-- Columna Izquierda: Visualizador Frente/Dorso -->
-        <div class="bg-crisCard border border-emerald-900/40 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center relative min-h-[380px]">
+        <!-- Columna Izquierda: Visualizador Real con Mockups SVG -->
+        <div class="bg-crisCard border border-emerald-900/40 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center relative min-h-[400px]">
           
           <!-- Selector de Vista (Frente / Dorso) en la parte superior -->
-          <div class="absolute top-4 left-4 right-4 flex justify-between items-center px-2">
+          <div class="absolute top-4 left-4 right-4 flex justify-between items-center px-2 z-20">
             <span class="text-[10px] uppercase font-bold tracking-wider bg-crisDark text-crisGold px-3 py-1 rounded-xl border border-emerald-800" x-text="tipoPrenda + ' (' + colorPrenda + ')'"></span>
             
-            <div class="flex bg-crisDark/80 p-1 rounded-xl border border-emerald-800/80">
+            <div class="flex bg-crisDark/90 p-1 rounded-xl border border-emerald-800/80">
               <button @click="vistaPrevisualizacion = 'frente'" :class="vistaPrevisualizacion === 'frente' ? 'bg-crisGold text-crisDark font-bold' : 'text-emerald-300/70'" class="px-3 py-1 rounded-lg text-[10px] uppercase transition">Frente</button>
               <button @click="vistaPrevisualizacion = 'dorso'" :class="vistaPrevisualizacion === 'dorso' ? 'bg-crisGold text-crisDark font-bold' : 'text-emerald-300/70'" class="px-3 py-1 rounded-lg text-[10px] uppercase transition">Dorso</button>
             </div>
           </div>
           
-          <!-- Mockup dinámico adaptado -->
-          <div class="w-64 h-72 shadow-inner flex flex-col items-center justify-center relative border border-black/20 transition-all duration-300 overflow-hidden mt-8"
-               :style="'background-color: ' + colorHex + '; ' + 
-                 (tipoPrenda === 'Musculosas' ? 'border-radius: 24px 24px 16px 16px; clip-path: polygon(25% 0%, 75% 0%, 90% 100%, 10% 100%);' : 
-                  tipoPrenda.includes('Buzo') ? 'border-radius: 35px 35px 16px 16px;' : 
-                  tipoPrenda === 'Bolsas Tote Bags' ? 'border-radius: 8px; width: 220px; height: 280px;' : 
-                  'border-radius: 20px 20px 16px 16px;')">
+          <!-- Mockup Vectorial Dinámico Real -->
+          <div class="w-64 h-72 relative flex items-center justify-center mt-10">
             
-            <template x-if="tipoPrenda === 'Buzo Canguro'">
-              <div class="absolute -top-4 w-24 h-8 bg-black/10 rounded-full border border-black/10"></div>
-            </template>
+            <!-- SVG Silhouette Mockups -->
+            <svg viewBox="0 0 240 240" class="w-full h-full drop-shadow-2xl absolute inset-0 pointer-events-none">
+              
+              <!-- Remeras Adulto / Niños -->
+              <g x-show="tipoPrenda === 'Remeras Adulto' || tipoPrenda === 'Remeras Niños'">
+                <path d="M75,30 C90,45 150,45 165,30 L205,65 L175,90 L160,75 L160,210 L80,210 L80,75 L65,90 L35,65 Z" :fill="colorHex" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
+                <path d="M75,30 C90,50 150,50 165,30 Z" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
+              </g>
 
-            <!-- VISTA FRENTE -->
-            <div x-show="vistaPrevisualizacion === 'frente'" class="border-2 border-dashed border-black/20 rounded-xl flex items-center justify-center relative overflow-hidden bg-white/10 w-44 h-48">
+              <!-- Musculosas -->
+              <g x-show="tipoPrenda === 'Musculosas'">
+                <path d="M85,35 Q100,60 120,60 Q140,60 155,35 L175,60 C170,120 165,160 160,210 L80,210 C75,160 70,120 65,60 Z" :fill="colorHex" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
+              </g>
+
+              <!-- Buzo Cuello Redondo -->
+              <g x-show="tipoPrenda === 'Buzo Cuello Redondo'">
+                <path d="M75,30 C90,42 150,42 165,30 L215,75 L185,100 L165,85 L160,210 L80,210 L75,85 L55,100 L25,75 Z" :fill="colorHex" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
+                <path d="M75,30 C90,48 150,48 165,30 Z" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
+              </g>
+
+              <!-- Buzo Canguro -->
+              <g x-show="tipoPrenda === 'Buzo Canguro'">
+                <path d="M90,35 Q120,-5 150,35 L165,30 L215,75 L185,100 L165,85 L160,210 L80,210 L75,85 L55,100 L25,75 L75,30 Z" :fill="colorHex" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
+                <path d="M95,150 L145,150 L155,190 L85,190 Z" fill="rgba(0,0,0,0.08)" stroke="rgba(0,0,0,0.15)" stroke-width="1.5"/>
+              </g>
+
+              <!-- Bolsas Tote Bags -->
+              <g x-show="tipoPrenda === 'Bolsas Tote Bags'">
+                <path d="M90,60 C90,10 150,10 150,60" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="4"/>
+                <rect x="65" y="60" width="110" height="150" rx="8" :fill="colorHex" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
+              </g>
+            </svg>
+
+            <!-- Área de Estampa Frente -->
+            <div x-show="vistaPrevisualizacion === 'frente'" class="absolute w-28 h-32 flex items-center justify-center overflow-hidden z-10" style="top: 32%;">
               <template x-if="!imagenFrente">
-                <span class="text-[11px] font-medium text-center px-2 text-black/60">Sin estampa (Frente)</span>
+                <span class="text-[10px] font-semibold text-center px-2 py-1 text-black/60 bg-white/50 backdrop-blur-xs rounded-lg border border-black/10 shadow-sm">Sin estampa (Frente)</span>
               </template>
               <template x-if="imagenFrente">
-                <img :src="imagenFrente" alt="Diseño Frente" class="object-contain transition-all duration-75" :style="'width: ' + ((anchoFrenteCm / 35) * 90) + '%; transform: translate(' + posicionXFrente + 'px, ' + posicionYFrente + 'px);'" />
+                <img :src="imagenFrente" alt="Diseño Frente" class="object-contain transition-all duration-75 drop-shadow-md" :style="'width: ' + ((anchoFrenteCm / 32) * 100) + '%; transform: translate(' + posicionXFrente + 'px, ' + posicionYFrente + 'px);'" />
               </template>
             </div>
 
-            <!-- VISTA DORSO -->
-            <div x-show="vistaPrevisualizacion === 'dorso'" class="border-2 border-dashed border-black/20 rounded-xl flex items-center justify-center relative overflow-hidden bg-white/10 w-44 h-48">
+            <!-- Área de Estampa Dorso -->
+            <div x-show="vistaPrevisualizacion === 'dorso'" class="absolute w-28 h-32 flex items-center justify-center overflow-hidden z-10" style="top: 32%;">
               <template x-if="!imagenDorso">
-                <span class="text-[11px] font-medium text-center px-2 text-black/60">Sin estampa (Dorso)</span>
+                <span class="text-[10px] font-semibold text-center px-2 py-1 text-black/60 bg-white/50 backdrop-blur-xs rounded-lg border border-black/10 shadow-sm">Sin estampa (Dorso)</span>
               </template>
               <template x-if="imagenDorso">
-                <img :src="imagenDorso" alt="Diseño Dorso" class="object-contain transition-all duration-75" :style="'width: ' + ((anchoDorsoCm / 35) * 90) + '%; transform: translate(' + posicionXDorso + 'px, ' + posicionYDorso + 'px);'" />
+                <img :src="imagenDorso" alt="Diseño Dorso" class="object-contain transition-all duration-75 drop-shadow-md" :style="'width: ' + ((anchoDorsoCm / 32) * 100) + '%; transform: translate(' + posicionXDorso + 'px, ' + posicionYDorso + 'px);'" />
               </template>
             </div>
             
-            <span class="text-[10px] mt-3 font-semibold uppercase tracking-widest text-black/50" x-text="'Vista: ' + vistaPrevisualizacion.toUpperCase()"></span>
           </div>
-          <p class="text-[11px] text-emerald-300/60 mt-4 text-center">Visualizá y ajusta ancho en cm, posición X e Y de cada estampa.</p>
+          <span class="text-[10px] mt-2 font-semibold uppercase tracking-widest text-emerald-300/70" x-text="'Vista: ' + vistaPrevisualizacion.toUpperCase()"></span>
+          <p class="text-[11px] text-emerald-300/60 mt-1 text-center">Visualización realista sobre mockup de prenda.</p>
         </div>
 
         <!-- Columna Derecha: Controles del Customizador -->
@@ -609,7 +632,7 @@
           <!-- Botón Enviar a WhatsApp -->
           <div class="pt-2">
             <button @click="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-bold text-sm transition shadow-lg flex items-center justify-center gap-2">
-              <span>📲 Enviar Diseño por WhatsApp</span>
+              <span>Enviar Diseño por WhatsApp</span>
             </button>
           </div>
 
