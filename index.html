@@ -67,7 +67,7 @@
 
           observacionesDiseño: '',
 
-          // Paleta de colores filtrada para Remeras Adulto (Negro corregido a #111111)
+          // Paleta de colores filtrada para Remeras Adulto (Negro real #111111)
           coloresPorPrenda() {
             switch(this.tipoPrenda) {
               case 'Remeras Adulto':
@@ -437,78 +437,76 @@
       <!-- ================= SECCIÓN 0: CUSTOMIZADOR PÚBLICO ================= -->
       <div x-show="seccionActiva === 'customizador'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        <!-- Columna Izquierda: Visualizador Real con Mockups SVG -->
-        <div class="bg-crisCard border border-emerald-900/40 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center relative min-h-[400px]">
+        <!-- Columna Izquierda: Visualizador Real con Mockup Fotorrealista en Percha -->
+        <div class="bg-gradient-to-b from-[#254A3B] to-[#163529] border border-emerald-900/40 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center relative min-h-[420px]">
           
           <!-- Selector de Vista (Frente / Dorso) en la parte superior -->
-          <div class="absolute top-4 left-4 right-4 flex justify-between items-center px-2 z-20">
-            <span class="text-[10px] uppercase font-bold tracking-wider bg-crisDark text-crisGold px-3 py-1 rounded-xl border border-emerald-800" x-text="tipoPrenda + ' (' + colorPrenda + ')'"></span>
+          <div class="absolute top-4 left-4 right-4 flex justify-between items-center px-2 z-30">
+            <span class="text-[10px] uppercase font-bold tracking-wider bg-crisDark text-crisGold px-3 py-1 rounded-xl border border-emerald-800 shadow-md" x-text="tipoPrenda + ' (' + colorPrenda + ')'"></span>
             
-            <div class="flex bg-crisDark/90 p-1 rounded-xl border border-emerald-800/80">
+            <div class="flex bg-crisDark/90 p-1 rounded-xl border border-emerald-800/80 shadow-md">
               <button @click="vistaPrevisualizacion = 'frente'" :class="vistaPrevisualizacion === 'frente' ? 'bg-crisGold text-crisDark font-bold' : 'text-emerald-300/70'" class="px-3 py-1 rounded-lg text-[10px] uppercase transition">Frente</button>
               <button @click="vistaPrevisualizacion = 'dorso'" :class="vistaPrevisualizacion === 'dorso' ? 'bg-crisGold text-crisDark font-bold' : 'text-emerald-300/70'" class="px-3 py-1 rounded-lg text-[10px] uppercase transition">Dorso</button>
             </div>
           </div>
           
-          <!-- Mockup Vectorial Dinámico Real -->
-          <div class="w-64 h-72 relative flex items-center justify-center mt-10">
+          <!-- Contenedor del Mockup Fotorrealista Estilo Estudio (Con Percha y Pliegues) -->
+          <div class="w-72 h-80 relative flex items-center justify-center mt-12 shadow-2xl rounded-2xl overflow-hidden border border-black/30 bg-neutral-800">
             
-            <!-- SVG Silhouette Mockups -->
-            <svg viewBox="0 0 240 240" class="w-full h-full drop-shadow-2xl absolute inset-0 pointer-events-none">
-              
-              <!-- Remeras Adulto / Niños -->
-              <g x-show="tipoPrenda === 'Remeras Adulto' || tipoPrenda === 'Remeras Niños'">
-                <path d="M75,30 C90,45 150,45 165,30 L205,65 L175,90 L160,75 L160,210 L80,210 L80,75 L65,90 L35,65 Z" :fill="colorHex" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
-                <path d="M75,30 C90,50 150,50 165,30 Z" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
-              </g>
-
-              <!-- Musculosas -->
-              <g x-show="tipoPrenda === 'Musculosas'">
-                <path d="M85,35 Q100,60 120,60 Q140,60 155,35 L175,60 C170,120 165,160 160,210 L80,210 C75,160 70,120 65,60 Z" :fill="colorHex" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
-              </g>
-
-              <!-- Buzo Cuello Redondo -->
-              <g x-show="tipoPrenda === 'Buzo Cuello Redondo'">
-                <path d="M75,30 C90,42 150,42 165,30 L215,75 L185,100 L165,85 L160,210 L80,210 L75,85 L55,100 L25,75 Z" :fill="colorHex" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
-                <path d="M75,30 C90,48 150,48 165,30 Z" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
-              </g>
-
-              <!-- Buzo Canguro -->
-              <g x-show="tipoPrenda === 'Buzo Canguro'">
-                <path d="M90,35 Q120,-5 150,35 L165,30 L215,75 L185,100 L165,85 L160,210 L80,210 L75,85 L55,100 L25,75 L75,30 Z" :fill="colorHex" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
-                <path d="M95,150 L145,150 L155,190 L85,190 Z" fill="rgba(0,0,0,0.08)" stroke="rgba(0,0,0,0.15)" stroke-width="1.5"/>
-              </g>
-
-              <!-- Bolsas Tote Bags -->
-              <g x-show="tipoPrenda === 'Bolsas Tote Bags'">
-                <path d="M90,60 C90,10 150,10 150,60" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="4"/>
-                <rect x="65" y="60" width="110" height="150" rx="8" :fill="colorHex" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
-              </g>
+            <!-- Percha de metal superior con sombra -->
+            <svg viewBox="0 0 300 300" class="w-full h-full absolute inset-0 z-20 pointer-events-none drop-shadow-lg">
+              <!-- Gancho de la percha -->
+              <path d="M150,45 C150,25 165,15 175,25 C185,35 175,50 150,65" fill="none" stroke="#2c2c2c" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="150" cy="65" r="4" fill="#1a1a1a"/>
             </svg>
 
-            <!-- Área de Estampa Frente -->
-            <div x-show="vistaPrevisualizacion === 'frente'" class="absolute w-28 h-32 flex items-center justify-center overflow-hidden z-10" style="top: 32%;">
+            <!-- Base de Prenda con Color Dinámico -->
+            <div class="absolute inset-0 z-0 transition-colors duration-300" :style="'background-color: ' + colorHex + ';'"></div>
+
+            <!-- Capa de Shading / Iluminación / Pliegues Fotorrealistas (Simulando Estudio de Fotografía) -->
+            <svg viewBox="0 0 300 300" class="w-full h-full absolute inset-0 z-10 pointer-events-none mix-blend-overlay opacity-85">
+              <defs>
+                <linearGradient id="foldLight" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"/>
+                  <stop offset="50%" stop-color="#000000" stop-opacity="0.05"/>
+                  <stop offset="100%" stop-color="#000000" stop-opacity="0.5"/>
+                </linearGradient>
+                <radialGradient id="chestShade" cx="50%" cy="40%" r="50%">
+                  <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/>
+                  <stop offset="100%" stop-color="#000000" stop-opacity="0.4"/>
+                </radialGradient>
+              </defs>
+              <!-- Silueta de la remera colgando con hombros y mangas -->
+              <path d="M90,65 C110,65 135,70 150,70 C165,70 190,65 210,75 L265,115 L245,145 L225,125 L215,270 L85,270 L75,125 L55,145 L35,115 L90,65 Z" fill="url(#foldLight)"/>
+              <!-- Sombra central de pecho -->
+              <ellipse cx="150" cy="140" rx="70" ry="60" fill="url(#chestShade)"/>
+              <!-- Cuello / Escote -->
+              <path d="M115,70 C130,88 170,88 185,70 C170,82 130,82 115,70 Z" fill="#000000" opacity="0.3"/>
+            </svg>
+
+            <!-- VISTA FRENTE (Estampa) -->
+            <div x-show="vistaPrevisualizacion === 'frente'" class="absolute w-36 h-40 flex items-center justify-center overflow-hidden z-20" style="top: 36%;">
               <template x-if="!imagenFrente">
-                <span class="text-[10px] font-semibold text-center px-2 py-1 text-black/60 bg-white/50 backdrop-blur-xs rounded-lg border border-black/10 shadow-sm">Sin estampa (Frente)</span>
+                <span class="text-[10px] font-bold text-center px-3 py-1.5 text-neutral-700 bg-white/80 backdrop-blur-xs rounded-xl border border-black/20 shadow-md">Sin estampa (Frente)</span>
               </template>
               <template x-if="imagenFrente">
-                <img :src="imagenFrente" alt="Diseño Frente" class="object-contain transition-all duration-75 drop-shadow-md" :style="'width: ' + ((anchoFrenteCm / 32) * 100) + '%; transform: translate(' + posicionXFrente + 'px, ' + posicionYFrente + 'px);'" />
+                <img :src="imagenFrente" alt="Diseño Frente" class="object-contain transition-all duration-75 drop-shadow-xl" :style="'width: ' + ((anchoFrenteCm / 32) * 100) + '%; transform: translate(' + posicionXFrente + 'px, ' + posicionYFrente + 'px);'" />
               </template>
             </div>
 
-            <!-- Área de Estampa Dorso -->
-            <div x-show="vistaPrevisualizacion === 'dorso'" class="absolute w-28 h-32 flex items-center justify-center overflow-hidden z-10" style="top: 32%;">
+            <!-- VISTA DORSO (Estampa) -->
+            <div x-show="vistaPrevisualizacion === 'dorso'" class="absolute w-36 h-40 flex items-center justify-center overflow-hidden z-20" style="top: 36%;">
               <template x-if="!imagenDorso">
-                <span class="text-[10px] font-semibold text-center px-2 py-1 text-black/60 bg-white/50 backdrop-blur-xs rounded-lg border border-black/10 shadow-sm">Sin estampa (Dorso)</span>
+                <span class="text-[10px] font-bold text-center px-3 py-1.5 text-neutral-700 bg-white/80 backdrop-blur-xs rounded-xl border border-black/20 shadow-md">Sin estampa (Dorso)</span>
               </template>
               <template x-if="imagenDorso">
-                <img :src="imagenDorso" alt="Diseño Dorso" class="object-contain transition-all duration-75 drop-shadow-md" :style="'width: ' + ((anchoDorsoCm / 32) * 100) + '%; transform: translate(' + posicionXDorso + 'px, ' + posicionYDorso + 'px);'" />
+                <img :src="imagenDorso" alt="Diseño Dorso" class="object-contain transition-all duration-75 drop-shadow-xl" :style="'width: ' + ((anchoDorsoCm / 32) * 100) + '%; transform: translate(' + posicionXDorso + 'px, ' + posicionYDorso + 'px);'" />
               </template>
             </div>
             
           </div>
-          <span class="text-[10px] mt-2 font-semibold uppercase tracking-widest text-emerald-300/70" x-text="'Vista: ' + vistaPrevisualizacion.toUpperCase()"></span>
-          <p class="text-[11px] text-emerald-300/60 mt-1 text-center">Visualización realista sobre mockup de prenda.</p>
+          <span class="text-[10px] mt-3 font-semibold uppercase tracking-widest text-emerald-300/80" x-text="'Vista: ' + vistaPrevisualizacion.toUpperCase()"></span>
+          <p class="text-[11px] text-emerald-300/60 mt-1 text-center">Mockup fotorrealista profesional en percha.</p>
         </div>
 
         <!-- Columna Derecha: Controles del Customizador -->
