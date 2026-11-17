@@ -182,7 +182,7 @@
             if (this.observacionesDiseño) {
               texto += `\n*Notas:* ${this.observacionesDiseño}\n`;
             }
-            texto += `\nTe envío los detalles para coordinar el pedido. ¡Gracias!`;
+            texto += `\n(Te adjunto la captura o imagen de mi diseño en este chat para que lo veas). ¡Gracias!`;
             
             let tuNumero = "5493413457465"; 
             
@@ -257,7 +257,7 @@
                 costoDtf: p.costo_dtf,
                 costoPackaging: p.costo_packaging,
                 multiplicador: p.multiplicador,
-                cantidad: 1, // Cantidad por defecto para la calculadora
+                cantidad: 1,
               }));
             } catch (e) { console.error(e); }
           },
@@ -668,11 +668,12 @@
             <textarea x-model="observacionesDiseño" rows="2" placeholder="Ej: Ubicación exacta de las estampas..." class="w-full bg-crisDark border border-emerald-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-crisGold"></textarea>
           </div>
 
-          <!-- Botón Enviar a WhatsApp -->
+          <!-- Botón Enviar a WhatsApp con aviso de imagen -->
           <div class="pt-2">
             <button @click="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-bold text-sm transition shadow-lg flex items-center justify-center gap-2">
               <span>Enviar Diseño por WhatsApp</span>
             </button>
+            <p class="text-[10px] text-emerald-300/70 text-center mt-2">💡 Al abrirse WhatsApp, podés adjuntar la captura de tu diseño para que Cris lo vea.</p>
           </div>
 
         </div>
