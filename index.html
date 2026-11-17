@@ -437,7 +437,7 @@
       <!-- ================= SECCIÓN 0: CUSTOMIZADOR PÚBLICO ================= -->
       <div x-show="seccionActiva === 'customizador'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        <!-- Columna Izquierda: Visualizador Real con Mockup Dinámico (Remera o Tote Bag con mockup2.svg) -->
+        <!-- Columna Izquierda: Visualizador Real con Mockup Dinámico -->
         <div class="bg-gradient-to-b from-[#1E382E] to-[#122A21] border border-emerald-900/50 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center relative min-h-[440px]">
           
           <!-- Selector de Vista (Frente / Dorso) en la parte superior -->
@@ -453,12 +453,41 @@
           <!-- Contenedor del Mockup -->
           <div class="w-64 h-80 relative flex items-center justify-center mt-12 shadow-2xl rounded-2xl overflow-hidden border-2 border-emerald-600/40 bg-[#0b1712]">
             
-            <!-- OPCIÓN A: Si es Bolsa Tote Bag -> Carga mockup2.svg -->
+            <!-- OPCIÓN A: Si es Bolsa Tote Bag -> Mockup Vectorial Dinámico -->
             <template x-if="tipoPrenda === 'Bolsas Tote Bags'">
-              <object data="mockup2.svg" type="image/svg+xml" style="width: 100%; height: 100%; position: absolute; inset: 0;" class="z-10 pointer-events-none drop-shadow-2xl">
-                <!-- Fallback por si el navegador requiere imagen o path directo -->
-                <img src="mockup2.svg" alt="Mockup Tote Bag" class="w-full h-full object-contain absolute inset-0 z-10" />
-              </object>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 600" style="width: 100%; height: 100%; position: absolute; inset: 0;" class="z-10 pointer-events-none drop-shadow-2xl">
+                <defs>
+                  <filter id="shadowTote" x="-10%" y="-10%" width="120%" height="120%">
+                    <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#000000" flood-opacity="0.4"/>
+                  </filter>
+                  <linearGradient id="lightingTote" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/>
+                    <stop offset="50%" stop-color="#000000" stop-opacity="0.05"/>
+                    <stop offset="100%" stop-color="#000000" stop-opacity="0.45"/>
+                  </linearGradient>
+                </defs>
+
+                <g filter="url(#shadowTote)">
+                  <!-- Manijas de la bolsa -->
+                  <path d="M 180 180 C 180 60, 220 30, 250 30 C 280 30, 320 60, 320 180" fill="none" stroke="#d4d4d4" stroke-width="18" stroke-linecap="round"/>
+                  <path d="M 195 180 C 195 80, 225 50, 250 50 C 275 50, 305 80, 305 180" fill="none" stroke="#9ca3af" stroke-width="6" stroke-linecap="round"/>
+
+                  <!-- Cuerpo de la Tote Bag (Toma el color seleccionado dinámicamente) -->
+                  <path d="M 120 180 L 380 180 Q 390 180 390 190 L 380 550 Q 380 570 360 570 L 140 570 Q 120 570 120 550 L 110 190 Q 110 180 120 180 Z" 
+                        :fill="colorHex" 
+                        stroke="rgba(255,255,255,0.3)" 
+                        stroke-width="3" 
+                        stroke-linejoin="round" />
+
+                  <!-- Capa de volumen e iluminación -->
+                  <path d="M 120 180 L 380 180 Q 390 180 390 190 L 380 550 Q 380 570 360 570 L 140 570 Q 120 570 120 550 L 110 190 Q 110 180 120 180 Z" 
+                        fill="url(#lightingTote)" 
+                        style="mix-blend-mode: overlay;" />
+
+                  <!-- Costuras superiores de refuerzo -->
+                  <rect x="120" y="185" width="260" height="20" fill="none" stroke="rgba(0,0,0,0.15)" stroke-width="2" rx="4"/>
+                </g>
+              </svg>
             </template>
 
             <!-- OPCIÓN B: Para Remeras y demás prendas -> SVG Vectorial Fotorrealista -->
