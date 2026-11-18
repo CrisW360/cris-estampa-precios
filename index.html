@@ -44,6 +44,25 @@
           gastos: [],
           inventario: [],
           mensaje: "",
+
+          // Control de Modales y Formularios
+          abrirModalPedido: false,
+          modoEdicionPedido: false,
+          pedidoIdEditando: null,
+          nuevo: { cliente_id: "", detalle: "", seña: 0, total: 0, etiqueta: "General", link_carpeta: "" },
+
+          abrirModalCliente: false,
+          modoEdicionCliente: false,
+          clienteIdEditando: null,
+          nuevoCliente: { nombre: "", telefono: "", email: "", localidad: "Rosario", zona: "", notas: "" },
+
+          abrirModalGasto: false,
+          nuevoGasto: { concepto: "", monto: 0, categoria: "DTF Tercerizado" },
+
+          abrirModalStock: false,
+          modoEdicionStock: false,
+          stockIdEditando: null,
+          nuevoItemStock: { item: "", categoria: "Prendas", stock_actual: 0, unidad: "Unidades", stock_minimo: 2 },
           
           // Estados del Customizador Público
           tipoPrenda: 'Remeras Adulto',
@@ -756,7 +775,10 @@
 
       <!-- ================= SECCIÓN 3: CLIENTES ================= -->
       <div x-show="seccionActiva === 'clientes'" style="display: none;">
-        <div class="flex justify-between items-center mb-6"><h2 class="text-xl font-black text-white">Agenda de Clientes</h2><button @click="abrirCrearCliente()" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl text-sm font-bold shadow">+ Nuevo Cliente</button></div>
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-black text-white">Agenda de Clientes</h2>
+          <button @click="abrirCrearCliente()" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl text-sm font-bold shadow">+ Nuevo Cliente</button>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <template x-for="c in clientes" :key="c.id">
             <div class="bg-crisCard border border-emerald-900/40 rounded-2xl p-4 shadow-xl flex flex-col justify-between">
@@ -769,7 +791,10 @@
 
       <!-- ================= SECCIÓN 4: FINANZAS ================= -->
       <div x-show="seccionActiva === 'finanzas'" style="display: none;">
-        <div class="flex justify-between items-center mb-6"><h2 class="text-xl font-black text-white">Finanzas y Caja</h2><button @click="abrirModalGasto = true" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl text-sm font-bold shadow">+ Registrar Gasto</button></div>
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-black text-white">Finanzas y Caja</h2>
+          <button @click="abrirModalGasto = true" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl text-sm font-bold shadow">+ Registrar Gasto</button>
+        </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div class="bg-crisCard border border-emerald-900/50 rounded-2xl p-4 shadow"><p class="text-[11px] uppercase text-emerald-300/60 font-semibold">Ventas Totales</p><p class="text-xl font-black text-white" x-text="formatMoney(totalVentas)"></p></div>
           <div class="bg-crisCard border border-emerald-900/50 rounded-2xl p-4 shadow"><p class="text-[11px] uppercase text-emerald-300/60 font-semibold">Señas en Caja</p><p class="text-xl font-black text-emerald-300" x-text="formatMoney(totalSeñasRecibidas)"></p></div>
@@ -794,7 +819,10 @@
 
       <!-- ================= SECCIÓN 5: STOCK ================= -->
       <div x-show="seccionActiva === 'stock'" style="display: none;">
-        <div class="flex justify-between items-center mb-6"><h2 class="text-xl font-black text-white">Stock e Inventario</h2><button @click="abrirCrearStock()" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl text-sm font-bold shadow">+ Nuevo Item</button></div>
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-black text-white">Stock e Inventario</h2>
+          <button @click="abrirCrearStock()" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl text-sm font-bold shadow">+ Nuevo Item</button>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <template x-for="i in inventario" :key="i.id">
             <div class="bg-crisCard border border-emerald-900/40 rounded-3xl p-5 shadow flex flex-col justify-between">
@@ -828,13 +856,75 @@
       <!-- MODAL NUEVO PEDIDO -->
       <div x-show="abrirModalPedido" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
         <div class="bg-crisCard border border-emerald-900 rounded-3xl p-6 w-full max-w-md shadow-2xl" @click.away="abrirModalPedido = false">
-          <h3 class="text-lg font-bold text-white mb-4">Nuevo Pedido</h3>
+          <h3 class="text-lg font-bold text-white mb-4" x-text="modoEdicionPedido ? 'Editar Pedido' : 'Nuevo Pedido'"></h3>
           <form @submit.prevent="guardarPedido()" class="space-y-3 text-xs">
             <div><label class="text-emerald-300">Cliente</label><select x-model="nuevo.cliente_id" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white"><option value="">Seleccionar...</option><template x-for="c in clientes" :key="c.id"><option :value="c.id" x-text="c.nombre"></option></template></select></div>
             <div><label class="text-emerald-300">Detalle</label><textarea x-model="nuevo.detalle" required rows="2" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white"></textarea></div>
             <div class="grid grid-cols-2 gap-2"><div><label class="text-emerald-300">Seña ($)</label><input type="number" x-model="nuevo.seña" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div><div><label class="text-emerald-300">Total ($)</label><input type="number" x-model="nuevo.total" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div></div>
+            <div><label class="text-emerald-300">Etiqueta / Estado</label><input type="text" x-model="nuevo.etiqueta" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
             <div><label class="text-emerald-300">Link Drive</label><input type="text" x-model="nuevo.link_carpeta" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
             <div class="flex justify-end gap-2 pt-2"><button type="button" @click="abrirModalPedido = false" class="bg-gray-800 text-gray-300 px-4 py-2 rounded-xl">Cancelar</button><button type="submit" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl font-bold">Guardar</button></div>
+          </form>
+        </div>
+      </div>
+
+      <!-- MODAL NUEVO / EDITAR CLIENTE -->
+      <div x-show="abrirModalCliente" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-crisCard border border-emerald-900 rounded-3xl p-6 w-full max-w-md shadow-2xl" @click.away="abrirModalCliente = false">
+          <h3 class="text-lg font-bold text-white mb-4" x-text="modoEdicionCliente ? 'Editar Cliente' : 'Nuevo Cliente'"></h3>
+          <form @submit.prevent="guardarCliente()" class="space-y-3 text-xs">
+            <div><label class="text-emerald-300">Nombre</label><input type="text" x-model="nuevoCliente.nombre" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+            <div><label class="text-emerald-300">Teléfono</label><input type="text" x-model="nuevoCliente.telefono" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+            <div><label class="text-emerald-300">Email</label><input type="email" x-model="nuevoCliente.email" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="text-emerald-300">Localidad</label><input type="text" x-model="nuevoCliente.localidad" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+              <div><label class="text-emerald-300">Zona</label><input type="text" x-model="nuevoCliente.zona" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2"><button type="button" @click="abrirModalCliente = false" class="bg-gray-800 text-gray-300 px-4 py-2 rounded-xl">Cancelar</button><button type="submit" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl font-bold">Guardar</button></div>
+          </form>
+        </div>
+      </div>
+
+      <!-- MODAL REGISTRAR GASTO -->
+      <div x-show="abrirModalGasto" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-crisCard border border-emerald-900 rounded-3xl p-6 w-full max-w-md shadow-2xl" @click.away="abrirModalGasto = false">
+          <h3 class="text-lg font-bold text-white mb-4">Registrar Nuevo Gasto</h3>
+          <form @submit.prevent="guardarGasto()" class="space-y-3 text-xs">
+            <div><label class="text-emerald-300">Concepto</label><input type="text" x-model="nuevoGasto.concepto" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+            <div><label class="text-emerald-300">Monto ($)</label><input type="number" x-model.number="nuevoGasto.monto" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+            <div>
+              <label class="text-emerald-300">Categoría</label>
+              <select x-model="nuevoGasto.categoria" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white">
+                <option value="DTF Tercerizado">DTF Tercerizado</option>
+                <option value="Insumos / Prendas">Insumos / Prendas</option>
+                <option value="Servicios / Varios">Servicios / Varios</option>
+              </select>
+            </div>
+            <div class="flex justify-end gap-2 pt-2"><button type="button" @click="abrirModalGasto = false" class="bg-gray-800 text-gray-300 px-4 py-2 rounded-xl">Cancelar</button><button type="submit" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl font-bold">Guardar Gasto</button></div>
+          </form>
+        </div>
+      </div>
+
+      <!-- MODAL NUEVO / EDITAR ITEM DE STOCK -->
+      <div x-show="abrirModalStock" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-crisCard border border-emerald-900 rounded-3xl p-6 w-full max-w-md shadow-2xl" @click.away="abrirModalStock = false">
+          <h3 class="text-lg font-bold text-white mb-4" x-text="modoEdicionStock ? 'Editar Item de Stock' : 'Nuevo Item de Stock'"></h3>
+          <form @submit.prevent="guardarStockItem()" class="space-y-3 text-xs">
+            <div><label class="text-emerald-300">Nombre del Item</label><input type="text" x-model="nuevoItemStock.item" required class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+            <div>
+              <label class="text-emerald-300">Categoría</label>
+              <select x-model="nuevoItemStock.categoria" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white">
+                <option value="Prendas">Prendas</option>
+                <option value="DTF / Tintas">DTF / Tintas</option>
+                <option value="Packaging">Packaging</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="text-emerald-300">Stock Actual</label><input type="number" x-model.number="nuevoItemStock.stock_actual" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+              <div><label class="text-emerald-300">Unidad</label><input type="text" x-model="nuevoItemStock.unidad" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+            </div>
+            <div><label class="text-emerald-300">Stock Mínimo de Alerta</label><input type="number" x-model.number="nuevoItemStock.stock_minimo" class="w-full bg-crisDark border border-emerald-800 rounded-xl p-2 text-white" /></div>
+            <div class="flex justify-end gap-2 pt-2"><button type="button" @click="abrirModalStock = false" class="bg-gray-800 text-gray-300 px-4 py-2 rounded-xl">Cancelar</button><button type="submit" class="bg-crisGold text-crisDark px-4 py-2 rounded-xl font-bold">Guardar</button></div>
           </form>
         </div>
       </div>
